@@ -114,7 +114,7 @@ int main()
 
     // cuSZp-o testing.
     printf("=================================================\n");
-    printf("=========Testing cuSZp-o-f64 on REL 1E-2=========\n");
+    printf("=========Testing cuSZp-o-f32 on REL 1E-2=========\n");
     printf("=================================================\n");
     // cuSZp compression.
     timer_GPU.StartCounter(); // set timer
