@@ -73,8 +73,66 @@ That means VGC installation is succesful, please proceed to the next step.
 
 ### 2.3 Downloading Datasets
 
-Mention total datasets require 100 GB space and dependes on network bandwidth.
+There are 13 HPC datasets (11 single-precision and 2 double-precision) in total that are used to evaluate VGC.
+*The total size for those datasets requires 100 GB storage space.*
+12 of them (except RTM) can be automatially downloaded via following script.
+And these datasets will be downloaded into different folders under ```./datasets/```. 
 
+```shell
+$ python3 1-download-datasets.py
+# This command helps you download and arrange 12/13 HPC datasets (except RTM, RTM requires manually download from Google shared link).
+```
+
+
+RTM dataset, which has three fields *pressure_1000*, *pressure_2000*, and *pressure_3000*, cannot be downloaded through direct link access using ```wget```.
+We apologize for any inconvenience this may cause.
+As a result, we uploaded RTM in Google Drive. 
+The download links can be found here: *pressure_1000* ([link](https://drive.google.com/file/d/1EyhvfKHlLlJiDwqQ28XXn5Dbqiz8Zn3M/view?usp=sharing)), *pressure_2000* ([link](https://drive.google.com/file/d/1StITO-BxW4JHocx9-Pwe6jUy12j68Tva/view?usp=sharing)), *pressure_3000* ([link](https://drive.google.com/file/d/1FlKKw5HJQIi64vgeQ47GQWi-4BrlWRAJ/view?usp=sharing)).
+After you finish download it, please create a new folder ```rtm``` under ```./datasets/``` and move three RTM fields inside.
+
+After this step, your local repository should have the following structure.
+```shell
+-- vgc
+    -- vgc-compression/
+    -- # ... (other code base for optional evaluations)
+-- datasets
+    -- cesm_atm/
+    -- hacc/
+    -- hcci/
+    -- jetin/
+    -- magrec/
+    -- miranda/
+    -- nwchem/
+    -- nyx/
+    -- qmcpack/
+    -- rtm/
+    -- s3d/
+    -- scale/
+    -- syntruss/
+-- README.md
+-- 0-compile-vgc.py
+-- 1-download-datasets.py
+- # ... (other Python scripts)
+```
+
+To double check downloaded datasets, you can try the following command.
+```shell
+$ du -sh ./datasets/*
+21G     ./datasets/cesm_atm
+24G     ./datasets/hacc
+670M    ./datasets/hcci
+6.3G    ./datasets/jetin
+513M    ./datasets/magrec
+4.1G    ./datasets/miranda
+13G     ./datasets/nwchem
+3.1G    ./datasets/nyx
+1.2G    ./datasets/qmcpack
+4.0G    ./datasets/rtm
+52G     ./datasets/s3d
+6.4G    ./datasets/scale
+6.5G    ./datasets/syntruss
+```
+That means dataset preparation is successful. Please proceed to the next step.
 
 ## 3. Reproducing Main Evaluation Results
 
