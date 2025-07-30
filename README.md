@@ -73,6 +73,8 @@ That means VGC installation is succesful, please proceed to the next step.
 
 ### 2.3 Downloading Datasets
 
+Mention total datasets require 100 GB space and dependes on network bandwidth.
+
 
 ## 3. Reproducing Main Evaluation Results
 
