@@ -136,6 +136,10 @@ That means dataset preparation is successful. Please proceed to the next step.
 
 ## 3. Reproducing Main Evaluation Results
 
+This section provides instructions on reproducing the main evaluation results for VGC.
+Since VGC is a GPU lossy compressor for single-precision and double-precision HPC datasets, the main evaluation for VGC is the compression/decompression throughput and compression ratios.
+For other optional evaluations, reviewers can selectively execute them in Section 4.
+
 ### 3.1 Single-precision Throughput
 
 
