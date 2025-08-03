@@ -7,8 +7,8 @@ project(cuSZp VERSION 3.0.0 DESCRIPTION "Error-bounded GPU lossy compression lib
 # Enable languages
 enable_language(CXX CUDA)
 
-# Find required CUDA toolkit
-find_package(CUDAToolkit REQUIRED)
+# # Find required CUDA toolkit
+# find_package(CUDAToolkit REQUIRED)
 
 # Set C++ and CUDA standards
 set(CMAKE_CXX_STANDARD 17)
@@ -72,9 +72,9 @@ target_include_directories(cuSZp_shared
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-# Link CUDA runtime
-target_link_libraries(cuSZp_static PRIVATE CUDA::cudart)
-target_link_libraries(cuSZp_shared PRIVATE CUDA::cudart)
+# # Link CUDA runtime
+# target_link_libraries(cuSZp_static PRIVATE CUDA::cudart)
+# target_link_libraries(cuSZp_shared PRIVATE CUDA::cudart)
 
 # Set output name for libraries
 set_target_properties(cuSZp_static PROPERTIES OUTPUT_NAME cuSZp)

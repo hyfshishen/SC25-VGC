@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     char decFilePath[640] = {0};
     uint3 dims = {0, 0, 0};
     char errorBoundMode[4] = {0};
-    double errorBound = 0.0f;
+    float errorBound = 0.0f;
 
     // Flags to check if required arguments are provided
     int hasInput = 0, hasDims = 0, hasErrorBound = 0;
@@ -83,15 +83,15 @@ int main(int argc, char *argv[])
     // }
 
     // Data preparation on CPU.
-    double* oriData = NULL;
-    double* decData = NULL;
+    float* oriData = NULL;
+    float* decData = NULL;
     unsigned char* cmpBytes = NULL;
     size_t nbEle = 0;
     size_t cmpSize = 0;
     int status = 0;
-    oriData = readDoubleData_Yafan(oriFilePath, &nbEle, &status);
-    decData = (double*)malloc(nbEle*sizeof(double));
-    cmpBytes = (unsigned char*)malloc(nbEle*sizeof(double));
+    oriData = readFloatData_Yafan(oriFilePath, &nbEle, &status);
+    decData = (float*)malloc(nbEle*sizeof(float));
+    cmpBytes = (unsigned char*)malloc(nbEle*sizeof(float));
     if(nbEle != (size_t)dims.x * (size_t)dims.y * (size_t)dims.z) {
         fprintf(stderr, "Error: The number of elements in the original data does not match the dimensions\n");
         return 1;
@@ -99,8 +99,8 @@ int main(int argc, char *argv[])
     
     // Updating error bound if rel mode.
     if(strcmp(errorBoundMode, "rel") == 0) {
-        double max_val = oriData[0];
-        double min_val = oriData[0];
+        float max_val = oriData[0];
+        float min_val = oriData[0];
         for(size_t i=0; i<nbEle; i++) {
             if(oriData[i]>max_val)
                 max_val = oriData[i];
@@ -114,13 +114,13 @@ int main(int argc, char *argv[])
     TimingGPU timer_GPU;
 
     // Data preparation on GPU.
-    double* d_oriData;
-    double* d_decData;
+    float* d_oriData;
+    float* d_decData;
     unsigned char* d_cmpBytes;
-    cudaMalloc((void**)&d_oriData, sizeof(double)*nbEle);
-    cudaMemcpy(d_oriData, oriData, sizeof(double)*nbEle, cudaMemcpyHostToDevice);
-    cudaMalloc((void**)&d_decData, sizeof(double)*nbEle);
-    cudaMalloc((void**)&d_cmpBytes, sizeof(double)*nbEle);
+    cudaMalloc((void**)&d_oriData, sizeof(float)*nbEle);
+    cudaMemcpy(d_oriData, oriData, sizeof(float)*nbEle, cudaMemcpyHostToDevice);
+    cudaMalloc((void**)&d_decData, sizeof(float)*nbEle);
+    cudaMalloc((void**)&d_cmpBytes, sizeof(float)*nbEle);
 
     // Initializing CUDA Stream.
     cudaStream_t stream;
@@ -128,13 +128,13 @@ int main(int argc, char *argv[])
 
     // Warmup for NVIDIA GPU.
     for(int i=0; i<3; i++) {
-        cuSZp_compress_3D_plain_f64(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
+        cuSZp_compress_3D_plain_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
         // cuSZp_compress_3D_outlier_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
     }
 
     // cuSZp compression
     timer_GPU.StartCounter(); // set timer
-    cuSZp_compress_3D_plain_f64(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
+    cuSZp_compress_3D_plain_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
     // cuSZp_compress_3D_outlier_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
     float cmpTime = timer_GPU.GetCounter();
 
@@ -142,24 +142,25 @@ int main(int argc, char *argv[])
     // No need to add this part for real-world usages, this is only for testing compresion ratio correcness.
     unsigned char* cmpBytes_dup = (unsigned char*)malloc(cmpSize*sizeof(unsigned char));
     cudaMemcpy(cmpBytes_dup, d_cmpBytes, cmpSize*sizeof(unsigned char), cudaMemcpyDeviceToHost);
-    cudaMemset(d_cmpBytes, 0, sizeof(double)*nbEle); // set to zero for double check.
+    cudaMemset(d_cmpBytes, 0, sizeof(float)*nbEle); // set to zero for double check.
     cudaMemcpy(d_cmpBytes, cmpBytes_dup, cmpSize*sizeof(unsigned char), cudaMemcpyHostToDevice);
 
     // cuSZp decompression.
     timer_GPU.StartCounter(); // set timer
-    cuSZp_decompress_3D_plain_f64(d_decData, d_cmpBytes, nbEle, cmpSize, dims, errorBound, stream);
+    cuSZp_decompress_3D_plain_f32(d_decData, d_cmpBytes, nbEle, cmpSize, dims, errorBound, stream);
     // cuSZp_decompress_3D_outlier_f32(d_decData, d_cmpBytes, nbEle, cmpSize, dims, errorBound, stream);
     float decTime = timer_GPU.GetCounter();
 
     // Print result.
     printf("cuSZp finished! (3D implementation)\n");
-    printf("cuSZp compression   end-to-end speed: %f GB/s\n", (nbEle*sizeof(double)/1024.0/1024.0)/cmpTime);
-    printf("cuSZp decompression end-to-end speed: %f GB/s\n", (nbEle*sizeof(double)/1024.0/1024.0)/decTime);
-    printf("cuSZp compression ratio: %f\n\n", (nbEle*sizeof(double)/1024.0/1024.0)/(cmpSize*sizeof(unsigned char)/1024.0/1024.0));
+    printf("cuSZp compression   end-to-end speed: %f GB/s\n", (nbEle*sizeof(float)/1024.0/1024.0)/cmpTime);
+    printf("cuSZp decompression end-to-end speed: %f GB/s\n", (nbEle*sizeof(float)/1024.0/1024.0)/decTime);
+    printf("cuSZp compression ratio: %f\n", (nbEle*sizeof(float)/1024.0/1024.0)/(cmpSize*sizeof(unsigned char)/1024.0/1024.0));
+    printf("cuSZp compression size: %zu bytes\n", cmpSize*sizeof(unsigned char));
 
     // Error check.
     int not_bound = 0;
-    cudaMemcpy(decData, d_decData, sizeof(double)*nbEle, cudaMemcpyDeviceToHost);
+    cudaMemcpy(decData, d_decData, sizeof(float)*nbEle, cudaMemcpyDeviceToHost);
     for(size_t i=0; i<nbEle; i++) {
         if(fabs(oriData[i]-decData[i]) > errorBound*1.1) {
             not_bound++;

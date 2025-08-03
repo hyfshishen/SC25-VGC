@@ -7,8 +7,8 @@ This repository is for AD/AE process for SC'25 accepted paper "GPU Lossy Compres
 
 VGC is an error-bounded lossy compression library specifically designed for NVIDIA GPUs to compress floating-point data.
 This repository is for SC'25 AD/AE process.
-The official and final version of VGC will be updated into cuSZp repository [[LINK](https://github.com/szcompressor/cuSZp)].
-<u>For simplicity, we will still use the name VGC in this repository, to align with what is reported in the submission</u>.
+The official and final version of VGC will be updated into cuSZp repository [[LINK](https://github.com/szcompressor/cuSZp)] -- that's the reason you may see some "cuSZp" texts in compilation/execution phases.
+<u>For simplicity, we will still use the name VGC in this repository README, to align with what is reported in the submission</u>.
 In short, this repository contains three sections:
 - **2. Configuring VGC and Datasets**: In this section, reviewer can check software/hardware dependencies, compile VGC to executable binaries, and set up HPC datasets evaluated in the original paper.
 - **3. Reproducing Main Evaluation Results**: In this section, reviewer can reproduce main paper results that are related to the key metrics of VGC compressor, including throughput and compression ratios.

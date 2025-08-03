@@ -7,7 +7,7 @@
 #include <cuSZp.h>
 
 void printUsage() {
-    printf("Usage: ./cuSZp_3D -i [input_file_path] -d [dim_z] [dim_y] [dim_x] -eb [error_mode] [error_bound] [-x cmpFilePath] [-o decFilePath]\n");
+    printf("Usage: ./cuSZp_2D -i [input_file_path] -d [dim_z] [dim_y] [dim_x] -eb [error_mode] [error_bound] [-x cmpFilePath] [-o decFilePath]\n");
     printf("    -i  : Input file path (required)\n");
     printf("    -d  : Dimensions (required, order: dim_z dim_y dim_x, dim_x is the fastest dim)\n");
     printf("    -eb : Error bound mode (\"rel\" or \"abs\") followed by error bound value (required)\n");
@@ -128,14 +128,14 @@ int main(int argc, char *argv[])
 
     // Warmup for NVIDIA GPU.
     for(int i=0; i<3; i++) {
-        cuSZp_compress_3D_plain_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
-        // cuSZp_compress_3D_outlier_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
+        // cuSZp_compress_2D_plain_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
+        cuSZp_compress_2D_outlier_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
     }
 
     // cuSZp compression
     timer_GPU.StartCounter(); // set timer
-    cuSZp_compress_3D_plain_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
-    // cuSZp_compress_3D_outlier_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
+    // cuSZp_compress_2D_plain_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
+    cuSZp_compress_2D_outlier_f32(d_oriData, d_cmpBytes, nbEle, &cmpSize, dims, errorBound, stream);
     float cmpTime = timer_GPU.GetCounter();
 
     // Transfer compressed data to CPU then back to GPU, making sure compression ratio is correct.
@@ -147,15 +147,16 @@ int main(int argc, char *argv[])
 
     // cuSZp decompression.
     timer_GPU.StartCounter(); // set timer
-    cuSZp_decompress_3D_plain_f32(d_decData, d_cmpBytes, nbEle, cmpSize, dims, errorBound, stream);
-    // cuSZp_decompress_3D_outlier_f32(d_decData, d_cmpBytes, nbEle, cmpSize, dims, errorBound, stream);
+    // cuSZp_decompress_2D_plain_f32(d_decData, d_cmpBytes, nbEle, cmpSize, dims, errorBound, stream);
+    cuSZp_decompress_2D_outlier_f32(d_decData, d_cmpBytes, nbEle, cmpSize, dims, errorBound, stream);
     float decTime = timer_GPU.GetCounter();
 
     // Print result.
-    printf("cuSZp finished! (3D implementation)\n");
+    printf("cuSZp finished! (2D implementation)\n");
     printf("cuSZp compression   end-to-end speed: %f GB/s\n", (nbEle*sizeof(float)/1024.0/1024.0)/cmpTime);
     printf("cuSZp decompression end-to-end speed: %f GB/s\n", (nbEle*sizeof(float)/1024.0/1024.0)/decTime);
-    printf("cuSZp compression ratio: %f\n\n", (nbEle*sizeof(float)/1024.0/1024.0)/(cmpSize*sizeof(unsigned char)/1024.0/1024.0));
+    printf("cuSZp compression ratio: %f\n", (nbEle*sizeof(float)/1024.0/1024.0)/(cmpSize*sizeof(unsigned char)/1024.0/1024.0));
+    printf("cuSZp compression size: %zu bytes\n", cmpSize*sizeof(unsigned char));
 
     // Error check.
     int not_bound = 0;
