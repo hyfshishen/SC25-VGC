@@ -97,18 +97,33 @@ After this step, your local repository should have the following structure.
     -- # ... (other code base for optional evaluations)
 -- datasets
     -- cesm_atm/
+        -- # ... (all cesm_atm fields)
     -- hacc/
+        -- # ... (all hacc fields)
     -- hcci/
+        -- # ... (all hcci fields)
     -- jetin/
+        -- # ... (all jetin fields)
     -- magrec/
+        -- # ... (all magrec fields)
     -- miranda/
+        -- # ... (all miranda fields)
     -- nwchem/
+        -- # ... (all newchem fields)
     -- nyx/
+        -- # ... (all nyx fields)
     -- qmcpack/
+        -- # ... (all qmcpack fields)
     -- rtm/
+        -- pressure_1000
+        -- pressure_2000
+        -- pressure_3000
     -- s3d/
+        -- # ... (all s3d fields)
     -- scale/
+        -- # ... (all scale fields)
     -- syntruss/
+        -- # ... (all syntruss fields)
 -- README.md
 -- 0-compile-vgc.py
 -- 1-download-datasets.py
