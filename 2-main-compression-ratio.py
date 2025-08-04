@@ -39,7 +39,7 @@ def run_qmcpack(error_bound):
             vgc_o_cmp_size = line.split()[-2]
     vgc_ori_size = dds["qmcpack"][0] * dds["qmcpack"][1] * dds["qmcpack"][2] * dds["qmcpack"][3] * dds["qmcpack"][4] * 4
     print("QMCPack compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -64,7 +64,7 @@ def run_cesm_atm(error_bound):
                     vgc_o_cmp_size += int(line.split()[-2])
     vgc_ori_size = dds["cesm_atm"][0] * dds["cesm_atm"][1] * dds["cesm_atm"][2] * dds["cesm_atm"][3] * dds["cesm_atm"][4] * 4
     print("CESM_ATM compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -84,7 +84,7 @@ def run_miranda(error_bound):
             vgc_o_cmp_size = line.split()[-2]
     vgc_ori_size = dds["miranda"][0] * dds["miranda"][1] * dds["miranda"][2] * dds["miranda"][3] * dds["miranda"][4] * 4
     print("Miranda compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -104,7 +104,7 @@ def run_syntruss(error_bound):
             vgc_o_cmp_size = line.split()[-2]
     vgc_ori_size = dds["syntruss"][0] * dds["syntruss"][1] * dds["syntruss"][2] * dds["syntruss"][3] * dds["syntruss"][4] * 4
     print("SynTruss compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -124,7 +124,7 @@ def run_hcci(error_bound):
             vgc_o_cmp_size = line.split()[-2]
     vgc_ori_size = dds["hcci"][0] * dds["hcci"][1] * dds["hcci"][2] * dds["hcci"][3] * dds["hcci"][4] * 4
     print("HCCI compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -149,7 +149,7 @@ def run_rtm(error_bound):
                     vgc_o_cmp_size += int(line.split()[-2])
     vgc_ori_size = dds["rtm"][0] * dds["rtm"][1] * dds["rtm"][2] * dds["rtm"][3] * dds["rtm"][4] * 4
     print("RTM compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -169,7 +169,7 @@ def run_magrec(error_bound):
             vgc_o_cmp_size = line.split()[-2]
     vgc_ori_size = dds["magrec"][0] * dds["magrec"][1] * dds["magrec"][2] * dds["magrec"][3] * dds["magrec"][4] * 4
     print("MagRec compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -194,7 +194,7 @@ def run_hacc(error_bound):
                     vgc_o_cmp_size += int(line.split()[-2])
     vgc_ori_size = dds["hacc"][0] * dds["hacc"][1] * dds["hacc"][2] * dds["hacc"][3] * dds["hacc"][4] * 4
     print("HACC compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -219,7 +219,7 @@ def run_scale(error_bound):
                     vgc_o_cmp_size += int(line.split()[-2])
     vgc_ori_size = dds["scale"][0] * dds["scale"][1] * dds["scale"][2] * dds["scale"][3] * dds["scale"][4] * 4
     print("SCALE compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -244,7 +244,7 @@ def run_nyx(error_bound):
                     vgc_o_cmp_size += int(line.split()[-2])
     vgc_ori_size = dds["nyx"][0] * dds["nyx"][1] * dds["nyx"][2] * dds["nyx"][3] * dds["nyx"][4] * 4
     print("NYX compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -264,7 +264,7 @@ def run_jetin(error_bound):
             vgc_o_cmp_size = line.split()[-2]
     vgc_ori_size = dds["jetin"][0] * dds["jetin"][1] * dds["jetin"][2] * dds["jetin"][3] * dds["jetin"][4] * 4
     print("JetIn compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -289,7 +289,7 @@ def run_s3d():
                     vgc_o_cmp_size += int(line.split()[-2])
     vgc_ori_size = dds["s3d"][0] * dds["s3d"][1] * dds["s3d"][2] * dds["s3d"][3] * dds["s3d"][4] * 4
     print("S3D compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 
@@ -314,7 +314,7 @@ def run_nwchem(error_bound):
                     vgc_o_cmp_size += int(line.split()[-2])
     vgc_ori_size = (dds["nwchem"][0] + dds["nwchem"][1] + dds["nwchem"][2]) * dds["nwchem"][4] * 4
     print("NWChem compression ratio testing completed:")
-    print(f"VGC_N: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
+    print(f"VGC_D: {float(vgc_ori_size)/float(vgc_d_cmp_size)}")
     print(f"VGC_O: {float(vgc_ori_size)/float(vgc_o_cmp_size)}")
 
 

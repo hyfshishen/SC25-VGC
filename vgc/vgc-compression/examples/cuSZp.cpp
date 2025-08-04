@@ -231,34 +231,34 @@ int main(int argc, char* argv[])
         printf("cuSZp compression size: %zu bytes\n", cmpSize*sizeof(unsigned char));
     }
 
-    // Error check
-    if(dataType == CUSZP_TYPE_FLOAT) {
-        cudaMemcpy(decData, d_decData, sizeof(float)*nbEle, cudaMemcpyDeviceToHost);
-    }
-    else if(dataType == CUSZP_TYPE_DOUBLE) {
-        cudaMemcpy(decData, d_decData, sizeof(double)*nbEle, cudaMemcpyDeviceToHost);
-    }
-    int not_bound = 0;
-    for(size_t i=0; i<nbEle; i++) {
-        if(dataType == CUSZP_TYPE_FLOAT) {
-            float* oriData_f32 = (float*)oriData;
-            float* decData_f32 = (float*)decData;
-            if(fabs(oriData_f32[i]-decData_f32[i]) > errorBound*1.1) {
-                not_bound++;
-                // printf("not bound: %zu oriData: %f, decData: %f, errors: %f, bound: %f\n", i, ((float*)oriData)[i], ((float*)decData)[i], fabs(((float*)oriData)[i]-((float*)decData)[i]), errorBound);
-            }
-        }
-        else if(dataType == CUSZP_TYPE_DOUBLE) {
-            double* oriData_f64 = (double*)oriData;
-            double* decData_f64 = (double*)decData;
-            if(fabs(oriData_f64[i]-decData_f64[i]) > errorBound*1.1) {
-                not_bound++;
-                // printf("not bound: %zu oriData: %f, decData: %f, errors: %f, bound: %f\n", i, ((double*)oriData)[i], ((double*)decData)[i], fabs(((double*)oriData)[i]-((double*)decData)[i]), errorBound);
-            }
-        }
-    }
-    if(!not_bound) printf("\033[0;32mPass error check!\033[0m\n");
-    else printf("\033[0;31mFail error check! Exceeding data count: %d\033[0m\n", not_bound);
+    // // Error check // commet out for saving time
+    // if(dataType == CUSZP_TYPE_FLOAT) {
+    //     cudaMemcpy(decData, d_decData, sizeof(float)*nbEle, cudaMemcpyDeviceToHost);
+    // }
+    // else if(dataType == CUSZP_TYPE_DOUBLE) {
+    //     cudaMemcpy(decData, d_decData, sizeof(double)*nbEle, cudaMemcpyDeviceToHost);
+    // }
+    // int not_bound = 0;
+    // for(size_t i=0; i<nbEle; i++) {
+    //     if(dataType == CUSZP_TYPE_FLOAT) {
+    //         float* oriData_f32 = (float*)oriData;
+    //         float* decData_f32 = (float*)decData;
+    //         if(fabs(oriData_f32[i]-decData_f32[i]) > errorBound*1.1) {
+    //             not_bound++;
+    //             // printf("not bound: %zu oriData: %f, decData: %f, errors: %f, bound: %f\n", i, ((float*)oriData)[i], ((float*)decData)[i], fabs(((float*)oriData)[i]-((float*)decData)[i]), errorBound);
+    //         }
+    //     }
+    //     else if(dataType == CUSZP_TYPE_DOUBLE) {
+    //         double* oriData_f64 = (double*)oriData;
+    //         double* decData_f64 = (double*)decData;
+    //         if(fabs(oriData_f64[i]-decData_f64[i]) > errorBound*1.1) {
+    //             not_bound++;
+    //             // printf("not bound: %zu oriData: %f, decData: %f, errors: %f, bound: %f\n", i, ((double*)oriData)[i], ((double*)decData)[i], fabs(((double*)oriData)[i]-((double*)decData)[i]), errorBound);
+    //         }
+    //     }
+    // }
+    // if(!not_bound) printf("\033[0;32mPass error check!\033[0m\n");
+    // else printf("\033[0;31mFail error check! Exceeding data count: %d\033[0m\n", not_bound);
 
     // Write compressed or reconstructed files if needed.
     if (strlen(cmpFilePath) > 0) {

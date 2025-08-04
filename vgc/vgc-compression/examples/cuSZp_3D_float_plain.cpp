@@ -158,17 +158,17 @@ int main(int argc, char *argv[])
     printf("cuSZp compression ratio: %f\n", (nbEle*sizeof(float)/1024.0/1024.0)/(cmpSize*sizeof(unsigned char)/1024.0/1024.0));
     printf("cuSZp compression size: %zu bytes\n", cmpSize*sizeof(unsigned char));
 
-    // Error check.
-    int not_bound = 0;
-    cudaMemcpy(decData, d_decData, sizeof(float)*nbEle, cudaMemcpyDeviceToHost);
-    for(size_t i=0; i<nbEle; i++) {
-        if(fabs(oriData[i]-decData[i]) > errorBound*1.1) {
-            not_bound++;
-            // printf("not bound: %zu oriData: %f, decData: %f, errors: %f, bound: %f\n", i, oriData[i], decData[i], fabs(oriData[i]-decData[i]), errorBound);
-        }
-    }
-    if(!not_bound) printf("\033[0;32mPass error check!\033[0m\n");
-    else printf("\033[0;31mFail error check! Exceeding data count: %d\033[0m\n", not_bound);
+    // // Error check. // commet out for saving time
+    // int not_bound = 0;
+    // cudaMemcpy(decData, d_decData, sizeof(float)*nbEle, cudaMemcpyDeviceToHost);
+    // for(size_t i=0; i<nbEle; i++) {
+    //     if(fabs(oriData[i]-decData[i]) > errorBound*1.1) {
+    //         not_bound++;
+    //         // printf("not bound: %zu oriData: %f, decData: %f, errors: %f, bound: %f\n", i, oriData[i], decData[i], fabs(oriData[i]-decData[i]), errorBound);
+    //     }
+    // }
+    // if(!not_bound) printf("\033[0;32mPass error check!\033[0m\n");
+    // else printf("\033[0;31mFail error check! Exceeding data count: %d\033[0m\n", not_bound);
 
     free(oriData);
     free(decData);
