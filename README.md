@@ -164,6 +164,76 @@ For other optional evaluations, reviewers can selectively execute them in Sectio
 
 ### 3.3 Compression Ratios
 
+```shell
+$ python3 2-main-compression-ratio.py 
+Running VGC on QMCPack with error bound 0.0001...
+QMCPack compression ratio testing completed:
+VGC_N: 4.39780037913534
+VGC_O: 4.410282750659778
+
+Running VGC on CESM_ATM with error bound 0.0001...
+CESM_ATM compression ratio testing completed:
+VGC_N: 5.853428092435023
+VGC_O: 13.078436499408149
+
+Running VGC on Miranda with error bound 0.0001...
+Miranda compression ratio testing completed:
+VGC_N: 2.3453982191692035
+VGC_O: 4.246087390984657
+
+Running VGC on SynTruss with error bound 0.0001...
+SynTruss compression ratio testing completed:
+VGC_N: 4.431762081837473
+VGC_O: 4.514645277080295
+
+Running VGC on HCCI with error bound 0.0001...
+HCCI compression ratio testing completed:
+VGC_N: 10.87289236173368
+VGC_O: 16.638339773825884
+
+Running VGC on RTM with error bound 0.0001...
+RTM compression ratio testing completed:
+VGC_N: 13.421132248645558
+VGC_O: 14.367026386659173
+
+Running VGC on MagRec with error bound 0.0001...
+MagRec compression ratio testing completed:
+VGC_N: 5.505416992148885
+VGC_O: 6.557747022515887
+
+Running VGC on HACC with error bound 0.0001...
+HACC compression ratio testing completed:
+VGC_N: 2.925713818243781
+VGC_O: 4.56036599655104
+
+Running VGC on SCALE with error bound 0.0001...
+SCALE compression ratio testing completed:
+VGC_N: 5.001284668377916
+VGC_O: 11.975460446868524
+
+Running VGC on NYX with error bound 0.0001...
+NYX compression ratio testing completed:
+VGC_N: 5.928949381249487
+VGC_O: 10.342027929977576
+
+Running VGC on JetIn with error bound 0.0001...
+JetIn compression ratio testing completed:
+VGC_N: 194.6607659935775
+VGC_O: 198.43005510018264
+
+Running VGC on S3D with error bound 0.0001...
+S3D compression ratio testing completed:
+VGC_N: 13.238351677437644
+VGC_O: 55.75890665478384
+
+Running VGC on NWChem with error bound 0.0001...
+NWChem compression ratio testing completed:
+VGC_N: 21.29462197891387
+VGC_O: 21.304424613043153
+
+All compression ratio tests completed.
+```
+
 ## 4. (Optional) Other Evaluation Results
 
 memory efficient compression
