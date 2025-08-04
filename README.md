@@ -363,6 +363,5 @@ To be updated if needed.
 ## 4.4 KV Cache Compression (Figure 20)
 To be updated if needed.
 
-
-
-
+## 4.5 HPC Data Movement (Figure 23)
+To be updated if needed.
