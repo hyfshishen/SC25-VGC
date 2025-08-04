@@ -154,6 +154,7 @@ That means dataset preparation is successful. Please proceed to the next step.
 
 This section provides instructions on reproducing the main evaluation results for VGC.
 Since VGC is a GPU lossy compressor for single-precision and double-precision HPC datasets, the main evaluation for VGC is the **compression/decompression throughput** and **compression ratios**.
+For each main evaluation section, we provide a Python script to reproduce the whole results within only one command line effort.
 For other optional evaluations, reviewers can selectively execute them in Section 4.
 
 ### 3.1 Single-precision Throughput (Figure 12, Figure 13)
@@ -345,12 +346,22 @@ Compression results reported in command line environment should match what is re
 
 ## 4. (Optional) Other Evaluation Results
 
-memory efficient compression
+This section provides instructions on reproducing the other evaluation results for VGC.
+For each subsection, reviewer may require extra efforts on compilation and configurable.
+However, we will provide step-by-step instructions here.
+To reproduce each result, we provide a Python script to reproduce the whole results within only one command line effort.
 
-selective decompression
+## 4.1 Memory-efficient Compression (Figure 15)
+To be updated if needed.
 
-RTM ratios
+## 4.2 Selective Decompression (Figure 16)
+To be updated if needed.
 
+## 4.3 Dimension Impacts on RTM Compression Ratios (Table 3)
+To be updated if needed.
+
+## 4.4 KV Cache Compression (Figure 20)
+To be updated if needed.
 
 
 
