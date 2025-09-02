@@ -1,5 +1,5 @@
 # # Find CUDA package
-# find_package(CUDAToolkit REQUIRED)
+find_package(CUDAToolkit REQUIRED)
 
 # Define the install directory for binaries
 set(install_dir ${PROJECT_BINARY_DIR}/examples/bin)
