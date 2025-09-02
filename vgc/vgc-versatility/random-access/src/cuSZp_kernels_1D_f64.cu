@@ -390,128 +390,128 @@ __global__ void cuSZp_decompress_kernel_1D_plain_f64(double* const __restrict__ 
     if(!lane) base_idx = excl_sum + rate_ofs;
     __syncthreads();
 
-    unsigned int base_cmp_byte_ofs = base_idx;
-    unsigned int cmp_byte_ofs;
-    unsigned int tmp_byte_ofs = 0;
-    unsigned int cur_byte_ofs = 0;
-    base_start_idx = warp * thread_chunk * 32;
-    for(int j=0; j<block_num; j++)
-    {
-        base_block_start_idx = base_start_idx + j * 1024 + lane * 32;
-        base_block_end_idx = base_block_start_idx + 32;
-        unsigned int sign_flag = 0;
+    // unsigned int base_cmp_byte_ofs = base_idx;
+    // unsigned int cmp_byte_ofs;
+    // unsigned int tmp_byte_ofs = 0;
+    // unsigned int cur_byte_ofs = 0;
+    // base_start_idx = warp * thread_chunk * 32;
+    // for(int j=0; j<block_num; j++)
+    // {
+    //     base_block_start_idx = base_start_idx + j * 1024 + lane * 32;
+    //     base_block_end_idx = base_block_start_idx + 32;
+    //     unsigned int sign_flag = 0;
 
-        tmp_byte_ofs = (fixed_rate[j]) ? (4+fixed_rate[j]*4) : 0;
-        #pragma unroll 5
-        for(int i=1; i<32; i<<=1)
-        {
-            int tmp = __shfl_up_sync(0xffffffff, tmp_byte_ofs, i);
-            if(lane >= i) tmp_byte_ofs += tmp;
-        }
-        unsigned int prev_thread = __shfl_up_sync(0xffffffff, tmp_byte_ofs, 1);
-        if(!lane) cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs;
-        else cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs + prev_thread;
+    //     tmp_byte_ofs = (fixed_rate[j]) ? (4+fixed_rate[j]*4) : 0;
+    //     #pragma unroll 5
+    //     for(int i=1; i<32; i<<=1)
+    //     {
+    //         int tmp = __shfl_up_sync(0xffffffff, tmp_byte_ofs, i);
+    //         if(lane >= i) tmp_byte_ofs += tmp;
+    //     }
+    //     unsigned int prev_thread = __shfl_up_sync(0xffffffff, tmp_byte_ofs, 1);
+    //     if(!lane) cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs;
+    //     else cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs + prev_thread;
 
-        if(fixed_rate[j])
-        {
-            tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-            sign_flag = (0xff000000 & (tmp_char.x << 24)) |
-                        (0x00ff0000 & (tmp_char.y << 16)) |
-                        (0x0000ff00 & (tmp_char.z << 8))  |
-                        (0x000000ff & tmp_char.w);
-            cmp_byte_ofs+=4;
+    //     if(fixed_rate[j])
+    //     {
+    //         tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //         sign_flag = (0xff000000 & (tmp_char.x << 24)) |
+    //                     (0x00ff0000 & (tmp_char.y << 16)) |
+    //                     (0x0000ff00 & (tmp_char.z << 8))  |
+    //                     (0x000000ff & tmp_char.w);
+    //         cmp_byte_ofs+=4;
             
-            for(int i=0; i<32; i++) absQuant[i] = 0;
-            for(int i=0; i<fixed_rate[j]; i++)
-            {
-                tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                cmp_byte_ofs+=4;
+    //         for(int i=0; i<32; i++) absQuant[i] = 0;
+    //         for(int i=0; i<fixed_rate[j]; i++)
+    //         {
+    //             tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //             cmp_byte_ofs+=4;
 
-                absQuant[0] |= ((tmp_char.x >> 7) & 0x00000001) << i;
-                absQuant[1] |= ((tmp_char.x >> 6) & 0x00000001) << i;
-                absQuant[2] |= ((tmp_char.x >> 5) & 0x00000001) << i;
-                absQuant[3] |= ((tmp_char.x >> 4) & 0x00000001) << i;
-                absQuant[4] |= ((tmp_char.x >> 3) & 0x00000001) << i;
-                absQuant[5] |= ((tmp_char.x >> 2) & 0x00000001) << i;
-                absQuant[6] |= ((tmp_char.x >> 1) & 0x00000001) << i;
-                absQuant[7] |= ((tmp_char.x >> 0) & 0x00000001) << i;
+    //             absQuant[0] |= ((tmp_char.x >> 7) & 0x00000001) << i;
+    //             absQuant[1] |= ((tmp_char.x >> 6) & 0x00000001) << i;
+    //             absQuant[2] |= ((tmp_char.x >> 5) & 0x00000001) << i;
+    //             absQuant[3] |= ((tmp_char.x >> 4) & 0x00000001) << i;
+    //             absQuant[4] |= ((tmp_char.x >> 3) & 0x00000001) << i;
+    //             absQuant[5] |= ((tmp_char.x >> 2) & 0x00000001) << i;
+    //             absQuant[6] |= ((tmp_char.x >> 1) & 0x00000001) << i;
+    //             absQuant[7] |= ((tmp_char.x >> 0) & 0x00000001) << i;
 
-                absQuant[8] |= ((tmp_char.y >> 7) & 0x00000001) << i;
-                absQuant[9] |= ((tmp_char.y >> 6) & 0x00000001) << i;
-                absQuant[10] |= ((tmp_char.y >> 5) & 0x00000001) << i;
-                absQuant[11] |= ((tmp_char.y >> 4) & 0x00000001) << i;
-                absQuant[12] |= ((tmp_char.y >> 3) & 0x00000001) << i;
-                absQuant[13] |= ((tmp_char.y >> 2) & 0x00000001) << i;
-                absQuant[14] |= ((tmp_char.y >> 1) & 0x00000001) << i;
-                absQuant[15] |= ((tmp_char.y >> 0) & 0x00000001) << i;
+    //             absQuant[8] |= ((tmp_char.y >> 7) & 0x00000001) << i;
+    //             absQuant[9] |= ((tmp_char.y >> 6) & 0x00000001) << i;
+    //             absQuant[10] |= ((tmp_char.y >> 5) & 0x00000001) << i;
+    //             absQuant[11] |= ((tmp_char.y >> 4) & 0x00000001) << i;
+    //             absQuant[12] |= ((tmp_char.y >> 3) & 0x00000001) << i;
+    //             absQuant[13] |= ((tmp_char.y >> 2) & 0x00000001) << i;
+    //             absQuant[14] |= ((tmp_char.y >> 1) & 0x00000001) << i;
+    //             absQuant[15] |= ((tmp_char.y >> 0) & 0x00000001) << i;
 
-                absQuant[16] |= ((tmp_char.z >> 7) & 0x00000001) << i;
-                absQuant[17] |= ((tmp_char.z >> 6) & 0x00000001) << i;
-                absQuant[18] |= ((tmp_char.z >> 5) & 0x00000001) << i;
-                absQuant[19] |= ((tmp_char.z >> 4) & 0x00000001) << i;
-                absQuant[20] |= ((tmp_char.z >> 3) & 0x00000001) << i;
-                absQuant[21] |= ((tmp_char.z >> 2) & 0x00000001) << i;
-                absQuant[22] |= ((tmp_char.z >> 1) & 0x00000001) << i;
-                absQuant[23] |= ((tmp_char.z >> 0) & 0x00000001) << i;
+    //             absQuant[16] |= ((tmp_char.z >> 7) & 0x00000001) << i;
+    //             absQuant[17] |= ((tmp_char.z >> 6) & 0x00000001) << i;
+    //             absQuant[18] |= ((tmp_char.z >> 5) & 0x00000001) << i;
+    //             absQuant[19] |= ((tmp_char.z >> 4) & 0x00000001) << i;
+    //             absQuant[20] |= ((tmp_char.z >> 3) & 0x00000001) << i;
+    //             absQuant[21] |= ((tmp_char.z >> 2) & 0x00000001) << i;
+    //             absQuant[22] |= ((tmp_char.z >> 1) & 0x00000001) << i;
+    //             absQuant[23] |= ((tmp_char.z >> 0) & 0x00000001) << i;
 
-                absQuant[24] |= ((tmp_char.w >> 7) & 0x00000001) << i;
-                absQuant[25] |= ((tmp_char.w >> 6) & 0x00000001) << i;
-                absQuant[26] |= ((tmp_char.w >> 5) & 0x00000001) << i;
-                absQuant[27] |= ((tmp_char.w >> 4) & 0x00000001) << i;
-                absQuant[28] |= ((tmp_char.w >> 3) & 0x00000001) << i;
-                absQuant[29] |= ((tmp_char.w >> 2) & 0x00000001) << i;
-                absQuant[30] |= ((tmp_char.w >> 1) & 0x00000001) << i;
-                absQuant[31] |= ((tmp_char.w >> 0) & 0x00000001) << i;
-            }
+    //             absQuant[24] |= ((tmp_char.w >> 7) & 0x00000001) << i;
+    //             absQuant[25] |= ((tmp_char.w >> 6) & 0x00000001) << i;
+    //             absQuant[26] |= ((tmp_char.w >> 5) & 0x00000001) << i;
+    //             absQuant[27] |= ((tmp_char.w >> 4) & 0x00000001) << i;
+    //             absQuant[28] |= ((tmp_char.w >> 3) & 0x00000001) << i;
+    //             absQuant[29] |= ((tmp_char.w >> 2) & 0x00000001) << i;
+    //             absQuant[30] |= ((tmp_char.w >> 1) & 0x00000001) << i;
+    //             absQuant[31] |= ((tmp_char.w >> 0) & 0x00000001) << i;
+    //         }
             
-            prevQuant = 0;
-            if(base_block_end_idx < nbEle)
-            {
-                #pragma unroll 8
-                for(int i=0; i<32; i+=4)
-                {
-                    sign_ofs = i % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.x = currQuant * eb * 2;
+    //         prevQuant = 0;
+    //         if(base_block_end_idx < nbEle)
+    //         {
+    //             #pragma unroll 8
+    //             for(int i=0; i<32; i+=4)
+    //             {
+    //                 sign_ofs = i % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.x = currQuant * eb * 2;
 
-                    sign_ofs = (i+1) % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+1] * -1 : absQuant[i+1];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.y = currQuant * eb * 2;
+    //                 sign_ofs = (i+1) % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+1] * -1 : absQuant[i+1];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.y = currQuant * eb * 2;
 
-                    sign_ofs = (i+2) % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+2] * -1 : absQuant[i+2];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.z = currQuant * eb * 2;
+    //                 sign_ofs = (i+2) % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+2] * -1 : absQuant[i+2];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.z = currQuant * eb * 2;
 
-                    sign_ofs = (i+3) % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+3] * -1 : absQuant[i+3];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.w = currQuant * eb * 2;
+    //                 sign_ofs = (i+3) % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+3] * -1 : absQuant[i+3];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.w = currQuant * eb * 2;
                     
-                    reinterpret_cast<double4*>(decData)[(base_block_start_idx+i)/4] = dec_buffer;
-                }
-            }
-            else
-            {
-                for(int i=0; i<32; i++)
-                {
-                    sign_ofs = i % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    if(base_block_start_idx+i < nbEle) decData[base_block_start_idx+i] = currQuant * eb * 2;
-                }
-            }      
-        }
+    //                 reinterpret_cast<double4*>(decData)[(base_block_start_idx+i)/4] = dec_buffer;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             for(int i=0; i<32; i++)
+    //             {
+    //                 sign_ofs = i % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 if(base_block_start_idx+i < nbEle) decData[base_block_start_idx+i] = currQuant * eb * 2;
+    //             }
+    //         }      
+    //     }
 
-        cur_byte_ofs += __shfl_sync(0xffffffff, tmp_byte_ofs, 31);
-    }
+    //     cur_byte_ofs += __shfl_sync(0xffffffff, tmp_byte_ofs, 31);
+    // }
 }
 
 
@@ -1246,484 +1246,484 @@ __global__ void cuSZp_decompress_kernel_1D_outlier_f64(double* const __restrict_
     if(!lane) base_idx = excl_sum + rate_ofs;
     __syncthreads();
 
-    unsigned int base_cmp_byte_ofs = base_idx;
-    unsigned int cmp_byte_ofs;
-    unsigned int tmp_byte_ofs = 0;
-    unsigned int cur_byte_ofs = 0;
-    base_start_idx = warp * thread_chunk * 32;
-    for(int j=0; j<block_num; j++)
-    {
-        int encoding_selection = fixed_rate[j] >> 7;
-        int outlier_byte_num = ((fixed_rate[j] & 0x60) >> 5) + 1;
-        fixed_rate[j] &= 0x1f;
-        int outlier_buffer = 0;
-        base_block_start_idx = base_start_idx + j * 1024 + lane * 32;
-        base_block_end_idx = base_block_start_idx + 32;
-        unsigned int sign_flag = 0;
+    // unsigned int base_cmp_byte_ofs = base_idx;
+    // unsigned int cmp_byte_ofs;
+    // unsigned int tmp_byte_ofs = 0;
+    // unsigned int cur_byte_ofs = 0;
+    // base_start_idx = warp * thread_chunk * 32;
+    // for(int j=0; j<block_num; j++)
+    // {
+    //     int encoding_selection = fixed_rate[j] >> 7;
+    //     int outlier_byte_num = ((fixed_rate[j] & 0x60) >> 5) + 1;
+    //     fixed_rate[j] &= 0x1f;
+    //     int outlier_buffer = 0;
+    //     base_block_start_idx = base_start_idx + j * 1024 + lane * 32;
+    //     base_block_end_idx = base_block_start_idx + 32;
+    //     unsigned int sign_flag = 0;
 
-        if(!encoding_selection) tmp_byte_ofs = (fixed_rate[j]) ? (4+fixed_rate[j]*4) : 0;
-        else tmp_byte_ofs = 4 + outlier_byte_num + fixed_rate[j] * 4;
-        #pragma unroll 5
-        for(int i=1; i<32; i<<=1)
-        {
-            int tmp = __shfl_up_sync(0xffffffff, tmp_byte_ofs, i);
-            if(lane >= i) tmp_byte_ofs += tmp;
-        }
-        unsigned int prev_thread = __shfl_up_sync(0xffffffff, tmp_byte_ofs, 1);
-        if(!lane) cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs;
-        else cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs + prev_thread;
+    //     if(!encoding_selection) tmp_byte_ofs = (fixed_rate[j]) ? (4+fixed_rate[j]*4) : 0;
+    //     else tmp_byte_ofs = 4 + outlier_byte_num + fixed_rate[j] * 4;
+    //     #pragma unroll 5
+    //     for(int i=1; i<32; i<<=1)
+    //     {
+    //         int tmp = __shfl_up_sync(0xffffffff, tmp_byte_ofs, i);
+    //         if(lane >= i) tmp_byte_ofs += tmp;
+    //     }
+    //     unsigned int prev_thread = __shfl_up_sync(0xffffffff, tmp_byte_ofs, 1);
+    //     if(!lane) cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs;
+    //     else cmp_byte_ofs = base_cmp_byte_ofs + cur_byte_ofs + prev_thread;
 
-        if(encoding_selection)
-        {
-            for(int i=0; i<outlier_byte_num; i++)
-            {
-                int buffer = cmpData[cmp_byte_ofs++] << (8*i);
-                outlier_buffer |= buffer;
-            }
+    //     if(encoding_selection)
+    //     {
+    //         for(int i=0; i<outlier_byte_num; i++)
+    //         {
+    //             int buffer = cmpData[cmp_byte_ofs++] << (8*i);
+    //             outlier_buffer |= buffer;
+    //         }
 
-            if(!fixed_rate[j])
-            {
-                sign_flag = (0xff000000 & (cmpData[cmp_byte_ofs++] << 24)) |
-                            (0x00ff0000 & (cmpData[cmp_byte_ofs++] << 16)) |
-                            (0x0000ff00 & (cmpData[cmp_byte_ofs++] << 8))  |
-                            (0x000000ff & cmpData[cmp_byte_ofs++]);
-                absQuant[0] = outlier_buffer;
-                for(int i=1; i<32; i++) absQuant[i] = 0;
+    //         if(!fixed_rate[j])
+    //         {
+    //             sign_flag = (0xff000000 & (cmpData[cmp_byte_ofs++] << 24)) |
+    //                         (0x00ff0000 & (cmpData[cmp_byte_ofs++] << 16)) |
+    //                         (0x0000ff00 & (cmpData[cmp_byte_ofs++] << 8))  |
+    //                         (0x000000ff & cmpData[cmp_byte_ofs++]);
+    //             absQuant[0] = outlier_buffer;
+    //             for(int i=1; i<32; i++) absQuant[i] = 0;
 
-                prevQuant = 0;
-                if(base_block_end_idx < nbEle)
-                {
-                    #pragma unroll 8
-                    for(int i=0; i<32; i+=4)
-                    {
-                        sign_ofs = i % 32;
-                        lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
-                        currQuant = lorenQuant + prevQuant;
-                        prevQuant = currQuant;
-                        dec_buffer.x = currQuant * eb * 2;
+    //             prevQuant = 0;
+    //             if(base_block_end_idx < nbEle)
+    //             {
+    //                 #pragma unroll 8
+    //                 for(int i=0; i<32; i+=4)
+    //                 {
+    //                     sign_ofs = i % 32;
+    //                     lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
+    //                     currQuant = lorenQuant + prevQuant;
+    //                     prevQuant = currQuant;
+    //                     dec_buffer.x = currQuant * eb * 2;
 
-                        sign_ofs = (i+1) % 32;
-                        lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+1] * -1 : absQuant[i+1];
-                        currQuant = lorenQuant + prevQuant;
-                        prevQuant = currQuant;
-                        dec_buffer.y = currQuant * eb * 2;
+    //                     sign_ofs = (i+1) % 32;
+    //                     lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+1] * -1 : absQuant[i+1];
+    //                     currQuant = lorenQuant + prevQuant;
+    //                     prevQuant = currQuant;
+    //                     dec_buffer.y = currQuant * eb * 2;
 
-                        sign_ofs = (i+2) % 32;
-                        lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+2] * -1 : absQuant[i+2];
-                        currQuant = lorenQuant + prevQuant;
-                        prevQuant = currQuant;
-                        dec_buffer.z = currQuant * eb * 2;
+    //                     sign_ofs = (i+2) % 32;
+    //                     lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+2] * -1 : absQuant[i+2];
+    //                     currQuant = lorenQuant + prevQuant;
+    //                     prevQuant = currQuant;
+    //                     dec_buffer.z = currQuant * eb * 2;
 
-                        sign_ofs = (i+3) % 32;
-                        lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+3] * -1 : absQuant[i+3];
-                        currQuant = lorenQuant + prevQuant;
-                        prevQuant = currQuant;
-                        dec_buffer.w = currQuant * eb * 2;
+    //                     sign_ofs = (i+3) % 32;
+    //                     lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+3] * -1 : absQuant[i+3];
+    //                     currQuant = lorenQuant + prevQuant;
+    //                     prevQuant = currQuant;
+    //                     dec_buffer.w = currQuant * eb * 2;
                         
-                        reinterpret_cast<double4*>(decData)[(base_block_start_idx+i)/4] = dec_buffer;
-                    }
-                }
-                else
-                {
-                    for(int i=0; i<32; i++)
-                    {
-                        sign_ofs = i % 32;
-                        lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
-                        currQuant = lorenQuant + prevQuant;
-                        prevQuant = currQuant;
-                        if(base_block_start_idx+i < nbEle) decData[base_block_start_idx+i] = currQuant * eb * 2;
-                    }
-                }
-            }
-        }
+    //                     reinterpret_cast<double4*>(decData)[(base_block_start_idx+i)/4] = dec_buffer;
+    //                 }
+    //             }
+    //             else
+    //             {
+    //                 for(int i=0; i<32; i++)
+    //                 {
+    //                     sign_ofs = i % 32;
+    //                     lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
+    //                     currQuant = lorenQuant + prevQuant;
+    //                     prevQuant = currQuant;
+    //                     if(base_block_start_idx+i < nbEle) decData[base_block_start_idx+i] = currQuant * eb * 2;
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        if(fixed_rate[j])
-        {
-            int vec_ofs = cmp_byte_ofs % 4;
-            if(vec_ofs==0)
-            {
-                for(int i=0; i<32; i++) absQuant[i] = 0;
+    //     if(fixed_rate[j])
+    //     {
+    //         int vec_ofs = cmp_byte_ofs % 4;
+    //         if(vec_ofs==0)
+    //         {
+    //             for(int i=0; i<32; i++) absQuant[i] = 0;
 
-                if(encoding_selection) absQuant[0] = outlier_buffer;
+    //             if(encoding_selection) absQuant[0] = outlier_buffer;
 
-                tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                sign_flag = (0xff000000 & (tmp_char.x << 24)) |
-                            (0x00ff0000 & (tmp_char.y << 16)) |
-                            (0x0000ff00 & (tmp_char.z << 8))  |
-                            (0x000000ff & tmp_char.w);
-                cmp_byte_ofs+=4;
+    //             tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //             sign_flag = (0xff000000 & (tmp_char.x << 24)) |
+    //                         (0x00ff0000 & (tmp_char.y << 16)) |
+    //                         (0x0000ff00 & (tmp_char.z << 8))  |
+    //                         (0x000000ff & tmp_char.w);
+    //             cmp_byte_ofs+=4;
 
-                for(int i=0; i<fixed_rate[j]; i++)
-                {
-                    tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                    cmp_byte_ofs+=4;
+    //             for(int i=0; i<fixed_rate[j]; i++)
+    //             {
+    //                 tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //                 cmp_byte_ofs+=4;
 
-                    if(!encoding_selection) absQuant[0] |= ((tmp_char.x >> 7) & 0x00000001) << i;
-                    absQuant[1] |= ((tmp_char.x >> 6) & 0x00000001) << i;
-                    absQuant[2] |= ((tmp_char.x >> 5) & 0x00000001) << i;
-                    absQuant[3] |= ((tmp_char.x >> 4) & 0x00000001) << i;
-                    absQuant[4] |= ((tmp_char.x >> 3) & 0x00000001) << i;
-                    absQuant[5] |= ((tmp_char.x >> 2) & 0x00000001) << i;
-                    absQuant[6] |= ((tmp_char.x >> 1) & 0x00000001) << i;
-                    absQuant[7] |= ((tmp_char.x >> 0) & 0x00000001) << i;
+    //                 if(!encoding_selection) absQuant[0] |= ((tmp_char.x >> 7) & 0x00000001) << i;
+    //                 absQuant[1] |= ((tmp_char.x >> 6) & 0x00000001) << i;
+    //                 absQuant[2] |= ((tmp_char.x >> 5) & 0x00000001) << i;
+    //                 absQuant[3] |= ((tmp_char.x >> 4) & 0x00000001) << i;
+    //                 absQuant[4] |= ((tmp_char.x >> 3) & 0x00000001) << i;
+    //                 absQuant[5] |= ((tmp_char.x >> 2) & 0x00000001) << i;
+    //                 absQuant[6] |= ((tmp_char.x >> 1) & 0x00000001) << i;
+    //                 absQuant[7] |= ((tmp_char.x >> 0) & 0x00000001) << i;
 
-                    absQuant[8] |= ((tmp_char.y >> 7) & 0x00000001) << i;
-                    absQuant[9] |= ((tmp_char.y >> 6) & 0x00000001) << i;
-                    absQuant[10] |= ((tmp_char.y >> 5) & 0x00000001) << i;
-                    absQuant[11] |= ((tmp_char.y >> 4) & 0x00000001) << i;
-                    absQuant[12] |= ((tmp_char.y >> 3) & 0x00000001) << i;
-                    absQuant[13] |= ((tmp_char.y >> 2) & 0x00000001) << i;
-                    absQuant[14] |= ((tmp_char.y >> 1) & 0x00000001) << i;
-                    absQuant[15] |= ((tmp_char.y >> 0) & 0x00000001) << i;
+    //                 absQuant[8] |= ((tmp_char.y >> 7) & 0x00000001) << i;
+    //                 absQuant[9] |= ((tmp_char.y >> 6) & 0x00000001) << i;
+    //                 absQuant[10] |= ((tmp_char.y >> 5) & 0x00000001) << i;
+    //                 absQuant[11] |= ((tmp_char.y >> 4) & 0x00000001) << i;
+    //                 absQuant[12] |= ((tmp_char.y >> 3) & 0x00000001) << i;
+    //                 absQuant[13] |= ((tmp_char.y >> 2) & 0x00000001) << i;
+    //                 absQuant[14] |= ((tmp_char.y >> 1) & 0x00000001) << i;
+    //                 absQuant[15] |= ((tmp_char.y >> 0) & 0x00000001) << i;
 
-                    absQuant[16] |= ((tmp_char.z >> 7) & 0x00000001) << i;
-                    absQuant[17] |= ((tmp_char.z >> 6) & 0x00000001) << i;
-                    absQuant[18] |= ((tmp_char.z >> 5) & 0x00000001) << i;
-                    absQuant[19] |= ((tmp_char.z >> 4) & 0x00000001) << i;
-                    absQuant[20] |= ((tmp_char.z >> 3) & 0x00000001) << i;
-                    absQuant[21] |= ((tmp_char.z >> 2) & 0x00000001) << i;
-                    absQuant[22] |= ((tmp_char.z >> 1) & 0x00000001) << i;
-                    absQuant[23] |= ((tmp_char.z >> 0) & 0x00000001) << i;
+    //                 absQuant[16] |= ((tmp_char.z >> 7) & 0x00000001) << i;
+    //                 absQuant[17] |= ((tmp_char.z >> 6) & 0x00000001) << i;
+    //                 absQuant[18] |= ((tmp_char.z >> 5) & 0x00000001) << i;
+    //                 absQuant[19] |= ((tmp_char.z >> 4) & 0x00000001) << i;
+    //                 absQuant[20] |= ((tmp_char.z >> 3) & 0x00000001) << i;
+    //                 absQuant[21] |= ((tmp_char.z >> 2) & 0x00000001) << i;
+    //                 absQuant[22] |= ((tmp_char.z >> 1) & 0x00000001) << i;
+    //                 absQuant[23] |= ((tmp_char.z >> 0) & 0x00000001) << i;
 
-                    absQuant[24] |= ((tmp_char.w >> 7) & 0x00000001) << i;
-                    absQuant[25] |= ((tmp_char.w >> 6) & 0x00000001) << i;
-                    absQuant[26] |= ((tmp_char.w >> 5) & 0x00000001) << i;
-                    absQuant[27] |= ((tmp_char.w >> 4) & 0x00000001) << i;
-                    absQuant[28] |= ((tmp_char.w >> 3) & 0x00000001) << i;
-                    absQuant[29] |= ((tmp_char.w >> 2) & 0x00000001) << i;
-                    absQuant[30] |= ((tmp_char.w >> 1) & 0x00000001) << i;
-                    absQuant[31] |= ((tmp_char.w >> 0) & 0x00000001) << i;
-                }
-            }
-            else if(vec_ofs==1)
-            {
-                for(int i=0; i<32; i++) absQuant[i] = 0;
+    //                 absQuant[24] |= ((tmp_char.w >> 7) & 0x00000001) << i;
+    //                 absQuant[25] |= ((tmp_char.w >> 6) & 0x00000001) << i;
+    //                 absQuant[26] |= ((tmp_char.w >> 5) & 0x00000001) << i;
+    //                 absQuant[27] |= ((tmp_char.w >> 4) & 0x00000001) << i;
+    //                 absQuant[28] |= ((tmp_char.w >> 3) & 0x00000001) << i;
+    //                 absQuant[29] |= ((tmp_char.w >> 2) & 0x00000001) << i;
+    //                 absQuant[30] |= ((tmp_char.w >> 1) & 0x00000001) << i;
+    //                 absQuant[31] |= ((tmp_char.w >> 0) & 0x00000001) << i;
+    //             }
+    //         }
+    //         else if(vec_ofs==1)
+    //         {
+    //             for(int i=0; i<32; i++) absQuant[i] = 0;
 
-                if(encoding_selection) absQuant[0] = outlier_buffer;
+    //             if(encoding_selection) absQuant[0] = outlier_buffer;
 
-                sign_flag = (0xff000000 & cmpData[cmp_byte_ofs++] << 24) |
-                            (0x00ff0000 & cmpData[cmp_byte_ofs++] << 16) |
-                            (0x0000ff00 & cmpData[cmp_byte_ofs++] << 8);
+    //             sign_flag = (0xff000000 & cmpData[cmp_byte_ofs++] << 24) |
+    //                         (0x00ff0000 & cmpData[cmp_byte_ofs++] << 16) |
+    //                         (0x0000ff00 & cmpData[cmp_byte_ofs++] << 8);
 
-                tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                sign_flag |= (0x000000ff & tmp_char.x);
+    //             tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //             sign_flag |= (0x000000ff & tmp_char.x);
 
-                if(!encoding_selection) absQuant[0] |= ((tmp_char.y >> 7) & 0x00000001);
-                absQuant[1] |= ((tmp_char.y >> 6) & 0x00000001);
-                absQuant[2] |= ((tmp_char.y >> 5) & 0x00000001);
-                absQuant[3] |= ((tmp_char.y >> 4) & 0x00000001);
-                absQuant[4] |= ((tmp_char.y >> 3) & 0x00000001);
-                absQuant[5] |= ((tmp_char.y >> 2) & 0x00000001);
-                absQuant[6] |= ((tmp_char.y >> 1) & 0x00000001);
-                absQuant[7] |= ((tmp_char.y >> 0) & 0x00000001);
+    //             if(!encoding_selection) absQuant[0] |= ((tmp_char.y >> 7) & 0x00000001);
+    //             absQuant[1] |= ((tmp_char.y >> 6) & 0x00000001);
+    //             absQuant[2] |= ((tmp_char.y >> 5) & 0x00000001);
+    //             absQuant[3] |= ((tmp_char.y >> 4) & 0x00000001);
+    //             absQuant[4] |= ((tmp_char.y >> 3) & 0x00000001);
+    //             absQuant[5] |= ((tmp_char.y >> 2) & 0x00000001);
+    //             absQuant[6] |= ((tmp_char.y >> 1) & 0x00000001);
+    //             absQuant[7] |= ((tmp_char.y >> 0) & 0x00000001);
 
-                absQuant[8] |= ((tmp_char.z >> 7) & 0x00000001);
-                absQuant[9] |= ((tmp_char.z >> 6) & 0x00000001);
-                absQuant[10] |= ((tmp_char.z >> 5) & 0x00000001);
-                absQuant[11] |= ((tmp_char.z >> 4) & 0x00000001);
-                absQuant[12] |= ((tmp_char.z >> 3) & 0x00000001);
-                absQuant[13] |= ((tmp_char.z >> 2) & 0x00000001);
-                absQuant[14] |= ((tmp_char.z >> 1) & 0x00000001);
-                absQuant[15] |= ((tmp_char.z >> 0) & 0x00000001);
+    //             absQuant[8] |= ((tmp_char.z >> 7) & 0x00000001);
+    //             absQuant[9] |= ((tmp_char.z >> 6) & 0x00000001);
+    //             absQuant[10] |= ((tmp_char.z >> 5) & 0x00000001);
+    //             absQuant[11] |= ((tmp_char.z >> 4) & 0x00000001);
+    //             absQuant[12] |= ((tmp_char.z >> 3) & 0x00000001);
+    //             absQuant[13] |= ((tmp_char.z >> 2) & 0x00000001);
+    //             absQuant[14] |= ((tmp_char.z >> 1) & 0x00000001);
+    //             absQuant[15] |= ((tmp_char.z >> 0) & 0x00000001);
 
-                absQuant[16] |= ((tmp_char.w >> 7) & 0x00000001);
-                absQuant[17] |= ((tmp_char.w >> 6) & 0x00000001);
-                absQuant[18] |= ((tmp_char.w >> 5) & 0x00000001);
-                absQuant[19] |= ((tmp_char.w >> 4) & 0x00000001);
-                absQuant[20] |= ((tmp_char.w >> 3) & 0x00000001);
-                absQuant[21] |= ((tmp_char.w >> 2) & 0x00000001);
-                absQuant[22] |= ((tmp_char.w >> 1) & 0x00000001);
-                absQuant[23] |= ((tmp_char.w >> 0) & 0x00000001);
-                cmp_byte_ofs+=4;
+    //             absQuant[16] |= ((tmp_char.w >> 7) & 0x00000001);
+    //             absQuant[17] |= ((tmp_char.w >> 6) & 0x00000001);
+    //             absQuant[18] |= ((tmp_char.w >> 5) & 0x00000001);
+    //             absQuant[19] |= ((tmp_char.w >> 4) & 0x00000001);
+    //             absQuant[20] |= ((tmp_char.w >> 3) & 0x00000001);
+    //             absQuant[21] |= ((tmp_char.w >> 2) & 0x00000001);
+    //             absQuant[22] |= ((tmp_char.w >> 1) & 0x00000001);
+    //             absQuant[23] |= ((tmp_char.w >> 0) & 0x00000001);
+    //             cmp_byte_ofs+=4;
 
-                for(int i=0; i<fixed_rate[j]-1; i++)
-                {
-                    tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                    cmp_byte_ofs+=4;
+    //             for(int i=0; i<fixed_rate[j]-1; i++)
+    //             {
+    //                 tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //                 cmp_byte_ofs+=4;
 
-                    absQuant[24] |= ((tmp_char.x >> 7) & 0x00000001) << i;
-                    absQuant[25] |= ((tmp_char.x >> 6) & 0x00000001) << i;
-                    absQuant[26] |= ((tmp_char.x >> 5) & 0x00000001) << i;
-                    absQuant[27] |= ((tmp_char.x >> 4) & 0x00000001) << i;
-                    absQuant[28] |= ((tmp_char.x >> 3) & 0x00000001) << i;
-                    absQuant[29] |= ((tmp_char.x >> 2) & 0x00000001) << i;
-                    absQuant[30] |= ((tmp_char.x >> 1) & 0x00000001) << i;
-                    absQuant[31] |= ((tmp_char.x >> 0) & 0x00000001) << i;
+    //                 absQuant[24] |= ((tmp_char.x >> 7) & 0x00000001) << i;
+    //                 absQuant[25] |= ((tmp_char.x >> 6) & 0x00000001) << i;
+    //                 absQuant[26] |= ((tmp_char.x >> 5) & 0x00000001) << i;
+    //                 absQuant[27] |= ((tmp_char.x >> 4) & 0x00000001) << i;
+    //                 absQuant[28] |= ((tmp_char.x >> 3) & 0x00000001) << i;
+    //                 absQuant[29] |= ((tmp_char.x >> 2) & 0x00000001) << i;
+    //                 absQuant[30] |= ((tmp_char.x >> 1) & 0x00000001) << i;
+    //                 absQuant[31] |= ((tmp_char.x >> 0) & 0x00000001) << i;
 
-                    if(!encoding_selection) absQuant[0] |= ((tmp_char.y >> 7) & 0x00000001) << (i+1);
-                    absQuant[1] |= ((tmp_char.y >> 6) & 0x00000001) << (i+1);
-                    absQuant[2] |= ((tmp_char.y >> 5) & 0x00000001) << (i+1);
-                    absQuant[3] |= ((tmp_char.y >> 4) & 0x00000001) << (i+1);
-                    absQuant[4] |= ((tmp_char.y >> 3) & 0x00000001) << (i+1);
-                    absQuant[5] |= ((tmp_char.y >> 2) & 0x00000001) << (i+1);
-                    absQuant[6] |= ((tmp_char.y >> 1) & 0x00000001) << (i+1);
-                    absQuant[7] |= ((tmp_char.y >> 0) & 0x00000001) << (i+1);
+    //                 if(!encoding_selection) absQuant[0] |= ((tmp_char.y >> 7) & 0x00000001) << (i+1);
+    //                 absQuant[1] |= ((tmp_char.y >> 6) & 0x00000001) << (i+1);
+    //                 absQuant[2] |= ((tmp_char.y >> 5) & 0x00000001) << (i+1);
+    //                 absQuant[3] |= ((tmp_char.y >> 4) & 0x00000001) << (i+1);
+    //                 absQuant[4] |= ((tmp_char.y >> 3) & 0x00000001) << (i+1);
+    //                 absQuant[5] |= ((tmp_char.y >> 2) & 0x00000001) << (i+1);
+    //                 absQuant[6] |= ((tmp_char.y >> 1) & 0x00000001) << (i+1);
+    //                 absQuant[7] |= ((tmp_char.y >> 0) & 0x00000001) << (i+1);
 
-                    absQuant[8] |= ((tmp_char.z >> 7) & 0x00000001) << (i+1);
-                    absQuant[9] |= ((tmp_char.z >> 6) & 0x00000001) << (i+1);
-                    absQuant[10] |= ((tmp_char.z >> 5) & 0x00000001) << (i+1);
-                    absQuant[11] |= ((tmp_char.z >> 4) & 0x00000001) << (i+1);
-                    absQuant[12] |= ((tmp_char.z >> 3) & 0x00000001) << (i+1);
-                    absQuant[13] |= ((tmp_char.z >> 2) & 0x00000001) << (i+1);
-                    absQuant[14] |= ((tmp_char.z >> 1) & 0x00000001) << (i+1);
-                    absQuant[15] |= ((tmp_char.z >> 0) & 0x00000001) << (i+1);
+    //                 absQuant[8] |= ((tmp_char.z >> 7) & 0x00000001) << (i+1);
+    //                 absQuant[9] |= ((tmp_char.z >> 6) & 0x00000001) << (i+1);
+    //                 absQuant[10] |= ((tmp_char.z >> 5) & 0x00000001) << (i+1);
+    //                 absQuant[11] |= ((tmp_char.z >> 4) & 0x00000001) << (i+1);
+    //                 absQuant[12] |= ((tmp_char.z >> 3) & 0x00000001) << (i+1);
+    //                 absQuant[13] |= ((tmp_char.z >> 2) & 0x00000001) << (i+1);
+    //                 absQuant[14] |= ((tmp_char.z >> 1) & 0x00000001) << (i+1);
+    //                 absQuant[15] |= ((tmp_char.z >> 0) & 0x00000001) << (i+1);
 
-                    absQuant[16] |= ((tmp_char.w >> 7) & 0x00000001) << (i+1);
-                    absQuant[17] |= ((tmp_char.w >> 6) & 0x00000001) << (i+1);
-                    absQuant[18] |= ((tmp_char.w >> 5) & 0x00000001) << (i+1);
-                    absQuant[19] |= ((tmp_char.w >> 4) & 0x00000001) << (i+1);
-                    absQuant[20] |= ((tmp_char.w >> 3) & 0x00000001) << (i+1);
-                    absQuant[21] |= ((tmp_char.w >> 2) & 0x00000001) << (i+1);
-                    absQuant[22] |= ((tmp_char.w >> 1) & 0x00000001) << (i+1);
-                    absQuant[23] |= ((tmp_char.w >> 0) & 0x00000001) << (i+1);
-                }
+    //                 absQuant[16] |= ((tmp_char.w >> 7) & 0x00000001) << (i+1);
+    //                 absQuant[17] |= ((tmp_char.w >> 6) & 0x00000001) << (i+1);
+    //                 absQuant[18] |= ((tmp_char.w >> 5) & 0x00000001) << (i+1);
+    //                 absQuant[19] |= ((tmp_char.w >> 4) & 0x00000001) << (i+1);
+    //                 absQuant[20] |= ((tmp_char.w >> 3) & 0x00000001) << (i+1);
+    //                 absQuant[21] |= ((tmp_char.w >> 2) & 0x00000001) << (i+1);
+    //                 absQuant[22] |= ((tmp_char.w >> 1) & 0x00000001) << (i+1);
+    //                 absQuant[23] |= ((tmp_char.w >> 0) & 0x00000001) << (i+1);
+    //             }
 
-                int uchar_buffer = cmpData[cmp_byte_ofs++];
-                absQuant[24] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[25] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[26] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[27] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[28] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[29] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[30] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[31] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
-            }
-            else if(vec_ofs==2)
-            {
-                for(int i=0; i<32; i++) absQuant[i] = 0;
+    //             int uchar_buffer = cmpData[cmp_byte_ofs++];
+    //             absQuant[24] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[25] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[26] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[27] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[28] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[29] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[30] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[31] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
+    //         }
+    //         else if(vec_ofs==2)
+    //         {
+    //             for(int i=0; i<32; i++) absQuant[i] = 0;
 
-                if(encoding_selection) absQuant[0] = outlier_buffer;
+    //             if(encoding_selection) absQuant[0] = outlier_buffer;
 
-                sign_flag = (0xff000000 & cmpData[cmp_byte_ofs++] << 24) |
-                            (0x00ff0000 & cmpData[cmp_byte_ofs++] << 16);
+    //             sign_flag = (0xff000000 & cmpData[cmp_byte_ofs++] << 24) |
+    //                         (0x00ff0000 & cmpData[cmp_byte_ofs++] << 16);
 
-                tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                sign_flag |= (0x0000ff00 & tmp_char.x << 8) |
-                             (0x000000ff & tmp_char.y);
+    //             tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //             sign_flag |= (0x0000ff00 & tmp_char.x << 8) |
+    //                          (0x000000ff & tmp_char.y);
 
-                if(!encoding_selection) absQuant[0] |= ((tmp_char.z >> 7) & 0x00000001);
-                absQuant[1] |= ((tmp_char.z >> 6) & 0x00000001);
-                absQuant[2] |= ((tmp_char.z >> 5) & 0x00000001);
-                absQuant[3] |= ((tmp_char.z >> 4) & 0x00000001);
-                absQuant[4] |= ((tmp_char.z >> 3) & 0x00000001);
-                absQuant[5] |= ((tmp_char.z >> 2) & 0x00000001);
-                absQuant[6] |= ((tmp_char.z >> 1) & 0x00000001);
-                absQuant[7] |= ((tmp_char.z >> 0) & 0x00000001);
+    //             if(!encoding_selection) absQuant[0] |= ((tmp_char.z >> 7) & 0x00000001);
+    //             absQuant[1] |= ((tmp_char.z >> 6) & 0x00000001);
+    //             absQuant[2] |= ((tmp_char.z >> 5) & 0x00000001);
+    //             absQuant[3] |= ((tmp_char.z >> 4) & 0x00000001);
+    //             absQuant[4] |= ((tmp_char.z >> 3) & 0x00000001);
+    //             absQuant[5] |= ((tmp_char.z >> 2) & 0x00000001);
+    //             absQuant[6] |= ((tmp_char.z >> 1) & 0x00000001);
+    //             absQuant[7] |= ((tmp_char.z >> 0) & 0x00000001);
 
-                absQuant[8] |= ((tmp_char.w >> 7) & 0x00000001);
-                absQuant[9] |= ((tmp_char.w >> 6) & 0x00000001);
-                absQuant[10] |= ((tmp_char.w >> 5) & 0x00000001);
-                absQuant[11] |= ((tmp_char.w >> 4) & 0x00000001);
-                absQuant[12] |= ((tmp_char.w >> 3) & 0x00000001);
-                absQuant[13] |= ((tmp_char.w >> 2) & 0x00000001);
-                absQuant[14] |= ((tmp_char.w >> 1) & 0x00000001);
-                absQuant[15] |= ((tmp_char.w >> 0) & 0x00000001);
-                cmp_byte_ofs+=4;
+    //             absQuant[8] |= ((tmp_char.w >> 7) & 0x00000001);
+    //             absQuant[9] |= ((tmp_char.w >> 6) & 0x00000001);
+    //             absQuant[10] |= ((tmp_char.w >> 5) & 0x00000001);
+    //             absQuant[11] |= ((tmp_char.w >> 4) & 0x00000001);
+    //             absQuant[12] |= ((tmp_char.w >> 3) & 0x00000001);
+    //             absQuant[13] |= ((tmp_char.w >> 2) & 0x00000001);
+    //             absQuant[14] |= ((tmp_char.w >> 1) & 0x00000001);
+    //             absQuant[15] |= ((tmp_char.w >> 0) & 0x00000001);
+    //             cmp_byte_ofs+=4;
 
-                for(int i=0; i<fixed_rate[j]-1; i++)
-                {
-                    tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                    cmp_byte_ofs+=4;
+    //             for(int i=0; i<fixed_rate[j]-1; i++)
+    //             {
+    //                 tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //                 cmp_byte_ofs+=4;
 
-                    absQuant[16] |= ((tmp_char.x >> 7) & 0x00000001) << i;
-                    absQuant[17] |= ((tmp_char.x >> 6) & 0x00000001) << i;
-                    absQuant[18] |= ((tmp_char.x >> 5) & 0x00000001) << i;
-                    absQuant[19] |= ((tmp_char.x >> 4) & 0x00000001) << i;
-                    absQuant[20] |= ((tmp_char.x >> 3) & 0x00000001) << i;
-                    absQuant[21] |= ((tmp_char.x >> 2) & 0x00000001) << i;
-                    absQuant[22] |= ((tmp_char.x >> 1) & 0x00000001) << i;
-                    absQuant[23] |= ((tmp_char.x >> 0) & 0x00000001) << i;
+    //                 absQuant[16] |= ((tmp_char.x >> 7) & 0x00000001) << i;
+    //                 absQuant[17] |= ((tmp_char.x >> 6) & 0x00000001) << i;
+    //                 absQuant[18] |= ((tmp_char.x >> 5) & 0x00000001) << i;
+    //                 absQuant[19] |= ((tmp_char.x >> 4) & 0x00000001) << i;
+    //                 absQuant[20] |= ((tmp_char.x >> 3) & 0x00000001) << i;
+    //                 absQuant[21] |= ((tmp_char.x >> 2) & 0x00000001) << i;
+    //                 absQuant[22] |= ((tmp_char.x >> 1) & 0x00000001) << i;
+    //                 absQuant[23] |= ((tmp_char.x >> 0) & 0x00000001) << i;
 
-                    absQuant[24] |= ((tmp_char.y >> 7) & 0x00000001) << i;
-                    absQuant[25] |= ((tmp_char.y >> 6) & 0x00000001) << i;
-                    absQuant[26] |= ((tmp_char.y >> 5) & 0x00000001) << i;
-                    absQuant[27] |= ((tmp_char.y >> 4) & 0x00000001) << i;
-                    absQuant[28] |= ((tmp_char.y >> 3) & 0x00000001) << i;
-                    absQuant[29] |= ((tmp_char.y >> 2) & 0x00000001) << i;
-                    absQuant[30] |= ((tmp_char.y >> 1) & 0x00000001) << i;
-                    absQuant[31] |= ((tmp_char.y >> 0) & 0x00000001) << i;
+    //                 absQuant[24] |= ((tmp_char.y >> 7) & 0x00000001) << i;
+    //                 absQuant[25] |= ((tmp_char.y >> 6) & 0x00000001) << i;
+    //                 absQuant[26] |= ((tmp_char.y >> 5) & 0x00000001) << i;
+    //                 absQuant[27] |= ((tmp_char.y >> 4) & 0x00000001) << i;
+    //                 absQuant[28] |= ((tmp_char.y >> 3) & 0x00000001) << i;
+    //                 absQuant[29] |= ((tmp_char.y >> 2) & 0x00000001) << i;
+    //                 absQuant[30] |= ((tmp_char.y >> 1) & 0x00000001) << i;
+    //                 absQuant[31] |= ((tmp_char.y >> 0) & 0x00000001) << i;
 
-                    if(!encoding_selection) absQuant[0] |= ((tmp_char.z >> 7) & 0x00000001) << (i+1);
-                    absQuant[1] |= ((tmp_char.z >> 6) & 0x00000001) << (i+1);
-                    absQuant[2] |= ((tmp_char.z >> 5) & 0x00000001) << (i+1);
-                    absQuant[3] |= ((tmp_char.z >> 4) & 0x00000001) << (i+1);
-                    absQuant[4] |= ((tmp_char.z >> 3) & 0x00000001) << (i+1);
-                    absQuant[5] |= ((tmp_char.z >> 2) & 0x00000001) << (i+1);
-                    absQuant[6] |= ((tmp_char.z >> 1) & 0x00000001) << (i+1);
-                    absQuant[7] |= ((tmp_char.z >> 0) & 0x00000001) << (i+1);
+    //                 if(!encoding_selection) absQuant[0] |= ((tmp_char.z >> 7) & 0x00000001) << (i+1);
+    //                 absQuant[1] |= ((tmp_char.z >> 6) & 0x00000001) << (i+1);
+    //                 absQuant[2] |= ((tmp_char.z >> 5) & 0x00000001) << (i+1);
+    //                 absQuant[3] |= ((tmp_char.z >> 4) & 0x00000001) << (i+1);
+    //                 absQuant[4] |= ((tmp_char.z >> 3) & 0x00000001) << (i+1);
+    //                 absQuant[5] |= ((tmp_char.z >> 2) & 0x00000001) << (i+1);
+    //                 absQuant[6] |= ((tmp_char.z >> 1) & 0x00000001) << (i+1);
+    //                 absQuant[7] |= ((tmp_char.z >> 0) & 0x00000001) << (i+1);
 
-                    absQuant[8] |= ((tmp_char.w >> 7) & 0x00000001) << (i+1);
-                    absQuant[9] |= ((tmp_char.w >> 6) & 0x00000001) << (i+1);
-                    absQuant[10] |= ((tmp_char.w >> 5) & 0x00000001) << (i+1);
-                    absQuant[11] |= ((tmp_char.w >> 4) & 0x00000001) << (i+1);
-                    absQuant[12] |= ((tmp_char.w >> 3) & 0x00000001) << (i+1);
-                    absQuant[13] |= ((tmp_char.w >> 2) & 0x00000001) << (i+1);
-                    absQuant[14] |= ((tmp_char.w >> 1) & 0x00000001) << (i+1);
-                    absQuant[15] |= ((tmp_char.w >> 0) & 0x00000001) << (i+1);                    
-                }
+    //                 absQuant[8] |= ((tmp_char.w >> 7) & 0x00000001) << (i+1);
+    //                 absQuant[9] |= ((tmp_char.w >> 6) & 0x00000001) << (i+1);
+    //                 absQuant[10] |= ((tmp_char.w >> 5) & 0x00000001) << (i+1);
+    //                 absQuant[11] |= ((tmp_char.w >> 4) & 0x00000001) << (i+1);
+    //                 absQuant[12] |= ((tmp_char.w >> 3) & 0x00000001) << (i+1);
+    //                 absQuant[13] |= ((tmp_char.w >> 2) & 0x00000001) << (i+1);
+    //                 absQuant[14] |= ((tmp_char.w >> 1) & 0x00000001) << (i+1);
+    //                 absQuant[15] |= ((tmp_char.w >> 0) & 0x00000001) << (i+1);                    
+    //             }
 
-                int uchar_buffer = cmpData[cmp_byte_ofs++];
-                absQuant[16] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[17] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[18] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[19] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[20] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[21] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[22] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[23] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
+    //             int uchar_buffer = cmpData[cmp_byte_ofs++];
+    //             absQuant[16] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[17] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[18] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[19] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[20] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[21] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[22] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[23] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
 
-                uchar_buffer = cmpData[cmp_byte_ofs++];
-                absQuant[24] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[25] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[26] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[27] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[28] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[29] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[30] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[31] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
-            }
-            else
-            {
-                for(int i=0; i<32; i++) absQuant[i] = 0;
+    //             uchar_buffer = cmpData[cmp_byte_ofs++];
+    //             absQuant[24] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[25] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[26] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[27] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[28] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[29] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[30] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[31] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
+    //         }
+    //         else
+    //         {
+    //             for(int i=0; i<32; i++) absQuant[i] = 0;
 
-                if(encoding_selection) absQuant[0] = outlier_buffer;
+    //             if(encoding_selection) absQuant[0] = outlier_buffer;
 
-                sign_flag = (0xff000000 & cmpData[cmp_byte_ofs++] << 24);                            
+    //             sign_flag = (0xff000000 & cmpData[cmp_byte_ofs++] << 24);                            
 
-                tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                sign_flag |= (0x00ff0000 & tmp_char.x << 16) |
-                             (0x0000ff00 & tmp_char.y << 8)  |
-                             (0x000000ff & tmp_char.z);
+    //             tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //             sign_flag |= (0x00ff0000 & tmp_char.x << 16) |
+    //                          (0x0000ff00 & tmp_char.y << 8)  |
+    //                          (0x000000ff & tmp_char.z);
 
-                if(!encoding_selection) absQuant[0] |= ((tmp_char.w >> 7) & 0x00000001);
-                absQuant[1] |= ((tmp_char.w >> 6) & 0x00000001);
-                absQuant[2] |= ((tmp_char.w >> 5) & 0x00000001);
-                absQuant[3] |= ((tmp_char.w >> 4) & 0x00000001);
-                absQuant[4] |= ((tmp_char.w >> 3) & 0x00000001);
-                absQuant[5] |= ((tmp_char.w >> 2) & 0x00000001);
-                absQuant[6] |= ((tmp_char.w >> 1) & 0x00000001);
-                absQuant[7] |= ((tmp_char.w >> 0) & 0x00000001);
-                cmp_byte_ofs+=4;
+    //             if(!encoding_selection) absQuant[0] |= ((tmp_char.w >> 7) & 0x00000001);
+    //             absQuant[1] |= ((tmp_char.w >> 6) & 0x00000001);
+    //             absQuant[2] |= ((tmp_char.w >> 5) & 0x00000001);
+    //             absQuant[3] |= ((tmp_char.w >> 4) & 0x00000001);
+    //             absQuant[4] |= ((tmp_char.w >> 3) & 0x00000001);
+    //             absQuant[5] |= ((tmp_char.w >> 2) & 0x00000001);
+    //             absQuant[6] |= ((tmp_char.w >> 1) & 0x00000001);
+    //             absQuant[7] |= ((tmp_char.w >> 0) & 0x00000001);
+    //             cmp_byte_ofs+=4;
 
-                for(int i=0; i<fixed_rate[j]-1; i++)
-                {
-                    tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
-                    cmp_byte_ofs+=4;
+    //             for(int i=0; i<fixed_rate[j]-1; i++)
+    //             {
+    //                 tmp_char = reinterpret_cast<const uchar4*>(cmpData)[cmp_byte_ofs/4];
+    //                 cmp_byte_ofs+=4;
 
-                    absQuant[8] |= ((tmp_char.x >> 7) & 0x00000001) << i;
-                    absQuant[9] |= ((tmp_char.x >> 6) & 0x00000001) << i;
-                    absQuant[10] |= ((tmp_char.x >> 5) & 0x00000001) << i;
-                    absQuant[11] |= ((tmp_char.x >> 4) & 0x00000001) << i;
-                    absQuant[12] |= ((tmp_char.x >> 3) & 0x00000001) << i;
-                    absQuant[13] |= ((tmp_char.x >> 2) & 0x00000001) << i;
-                    absQuant[14] |= ((tmp_char.x >> 1) & 0x00000001) << i;
-                    absQuant[15] |= ((tmp_char.x >> 0) & 0x00000001) << i;
+    //                 absQuant[8] |= ((tmp_char.x >> 7) & 0x00000001) << i;
+    //                 absQuant[9] |= ((tmp_char.x >> 6) & 0x00000001) << i;
+    //                 absQuant[10] |= ((tmp_char.x >> 5) & 0x00000001) << i;
+    //                 absQuant[11] |= ((tmp_char.x >> 4) & 0x00000001) << i;
+    //                 absQuant[12] |= ((tmp_char.x >> 3) & 0x00000001) << i;
+    //                 absQuant[13] |= ((tmp_char.x >> 2) & 0x00000001) << i;
+    //                 absQuant[14] |= ((tmp_char.x >> 1) & 0x00000001) << i;
+    //                 absQuant[15] |= ((tmp_char.x >> 0) & 0x00000001) << i;
 
-                    absQuant[16] |= ((tmp_char.y >> 7) & 0x00000001) << i;
-                    absQuant[17] |= ((tmp_char.y >> 6) & 0x00000001) << i;
-                    absQuant[18] |= ((tmp_char.y >> 5) & 0x00000001) << i;
-                    absQuant[19] |= ((tmp_char.y >> 4) & 0x00000001) << i;
-                    absQuant[20] |= ((tmp_char.y >> 3) & 0x00000001) << i;
-                    absQuant[21] |= ((tmp_char.y >> 2) & 0x00000001) << i;
-                    absQuant[22] |= ((tmp_char.y >> 1) & 0x00000001) << i;
-                    absQuant[23] |= ((tmp_char.y >> 0) & 0x00000001) << i;
+    //                 absQuant[16] |= ((tmp_char.y >> 7) & 0x00000001) << i;
+    //                 absQuant[17] |= ((tmp_char.y >> 6) & 0x00000001) << i;
+    //                 absQuant[18] |= ((tmp_char.y >> 5) & 0x00000001) << i;
+    //                 absQuant[19] |= ((tmp_char.y >> 4) & 0x00000001) << i;
+    //                 absQuant[20] |= ((tmp_char.y >> 3) & 0x00000001) << i;
+    //                 absQuant[21] |= ((tmp_char.y >> 2) & 0x00000001) << i;
+    //                 absQuant[22] |= ((tmp_char.y >> 1) & 0x00000001) << i;
+    //                 absQuant[23] |= ((tmp_char.y >> 0) & 0x00000001) << i;
 
-                    absQuant[24] |= ((tmp_char.z >> 7) & 0x00000001) << i;
-                    absQuant[25] |= ((tmp_char.z >> 6) & 0x00000001) << i;
-                    absQuant[26] |= ((tmp_char.z >> 5) & 0x00000001) << i;
-                    absQuant[27] |= ((tmp_char.z >> 4) & 0x00000001) << i;
-                    absQuant[28] |= ((tmp_char.z >> 3) & 0x00000001) << i;
-                    absQuant[29] |= ((tmp_char.z >> 2) & 0x00000001) << i;
-                    absQuant[30] |= ((tmp_char.z >> 1) & 0x00000001) << i;
-                    absQuant[31] |= ((tmp_char.z >> 0) & 0x00000001) << i;
+    //                 absQuant[24] |= ((tmp_char.z >> 7) & 0x00000001) << i;
+    //                 absQuant[25] |= ((tmp_char.z >> 6) & 0x00000001) << i;
+    //                 absQuant[26] |= ((tmp_char.z >> 5) & 0x00000001) << i;
+    //                 absQuant[27] |= ((tmp_char.z >> 4) & 0x00000001) << i;
+    //                 absQuant[28] |= ((tmp_char.z >> 3) & 0x00000001) << i;
+    //                 absQuant[29] |= ((tmp_char.z >> 2) & 0x00000001) << i;
+    //                 absQuant[30] |= ((tmp_char.z >> 1) & 0x00000001) << i;
+    //                 absQuant[31] |= ((tmp_char.z >> 0) & 0x00000001) << i;
 
-                    if(!encoding_selection) absQuant[0] |= ((tmp_char.w >> 7) & 0x00000001) << (i+1);
-                    absQuant[1] |= ((tmp_char.w >> 6) & 0x00000001) << (i+1);
-                    absQuant[2] |= ((tmp_char.w >> 5) & 0x00000001) << (i+1);
-                    absQuant[3] |= ((tmp_char.w >> 4) & 0x00000001) << (i+1);
-                    absQuant[4] |= ((tmp_char.w >> 3) & 0x00000001) << (i+1);
-                    absQuant[5] |= ((tmp_char.w >> 2) & 0x00000001) << (i+1);
-                    absQuant[6] |= ((tmp_char.w >> 1) & 0x00000001) << (i+1);
-                    absQuant[7] |= ((tmp_char.w >> 0) & 0x00000001) << (i+1);                    
-                }
+    //                 if(!encoding_selection) absQuant[0] |= ((tmp_char.w >> 7) & 0x00000001) << (i+1);
+    //                 absQuant[1] |= ((tmp_char.w >> 6) & 0x00000001) << (i+1);
+    //                 absQuant[2] |= ((tmp_char.w >> 5) & 0x00000001) << (i+1);
+    //                 absQuant[3] |= ((tmp_char.w >> 4) & 0x00000001) << (i+1);
+    //                 absQuant[4] |= ((tmp_char.w >> 3) & 0x00000001) << (i+1);
+    //                 absQuant[5] |= ((tmp_char.w >> 2) & 0x00000001) << (i+1);
+    //                 absQuant[6] |= ((tmp_char.w >> 1) & 0x00000001) << (i+1);
+    //                 absQuant[7] |= ((tmp_char.w >> 0) & 0x00000001) << (i+1);                    
+    //             }
 
-                int uchar_buffer = cmpData[cmp_byte_ofs++];
-                absQuant[8] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[9] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[10] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[11] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[12] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[13] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[14] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[15] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
+    //             int uchar_buffer = cmpData[cmp_byte_ofs++];
+    //             absQuant[8] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[9] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[10] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[11] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[12] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[13] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[14] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[15] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
 
-                uchar_buffer = cmpData[cmp_byte_ofs++];
-                absQuant[16] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[17] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[18] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[19] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[20] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[21] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[22] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[23] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
+    //             uchar_buffer = cmpData[cmp_byte_ofs++];
+    //             absQuant[16] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[17] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[18] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[19] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[20] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[21] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[22] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[23] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
 
-                uchar_buffer = cmpData[cmp_byte_ofs++];
-                absQuant[24] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[25] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[26] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[27] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[28] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[29] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[30] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
-                absQuant[31] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
-            }
+    //             uchar_buffer = cmpData[cmp_byte_ofs++];
+    //             absQuant[24] |= ((uchar_buffer >> 7) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[25] |= ((uchar_buffer >> 6) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[26] |= ((uchar_buffer >> 5) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[27] |= ((uchar_buffer >> 4) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[28] |= ((uchar_buffer >> 3) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[29] |= ((uchar_buffer >> 2) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[30] |= ((uchar_buffer >> 1) & 0x00000001) << (fixed_rate[j]-1);
+    //             absQuant[31] |= ((uchar_buffer >> 0) & 0x00000001) << (fixed_rate[j]-1);
+    //         }
             
-            prevQuant = 0;
-            if(base_block_end_idx < nbEle)
-            {
-                #pragma unroll 8
-                for(int i=0; i<32; i+=4)
-                {
-                    sign_ofs = i % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.x = currQuant * eb * 2;
+    //         prevQuant = 0;
+    //         if(base_block_end_idx < nbEle)
+    //         {
+    //             #pragma unroll 8
+    //             for(int i=0; i<32; i+=4)
+    //             {
+    //                 sign_ofs = i % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.x = currQuant * eb * 2;
 
-                    sign_ofs = (i+1) % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+1] * -1 : absQuant[i+1];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.y = currQuant * eb * 2;
+    //                 sign_ofs = (i+1) % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+1] * -1 : absQuant[i+1];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.y = currQuant * eb * 2;
 
-                    sign_ofs = (i+2) % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+2] * -1 : absQuant[i+2];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.z = currQuant * eb * 2;
+    //                 sign_ofs = (i+2) % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+2] * -1 : absQuant[i+2];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.z = currQuant * eb * 2;
 
-                    sign_ofs = (i+3) % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+3] * -1 : absQuant[i+3];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    dec_buffer.w = currQuant * eb * 2;
+    //                 sign_ofs = (i+3) % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i+3] * -1 : absQuant[i+3];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 dec_buffer.w = currQuant * eb * 2;
                     
-                    reinterpret_cast<double4*>(decData)[(base_block_start_idx+i)/4] = dec_buffer;
-                }
-            }
-            else
-            {
-                for(int i=0; i<32; i++)
-                {
-                    sign_ofs = i % 32;
-                    lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
-                    currQuant = lorenQuant + prevQuant;
-                    prevQuant = currQuant;
-                    if(base_block_start_idx+i < nbEle) decData[base_block_start_idx+i] = currQuant * eb * 2;
-                }
-            }
-        }
+    //                 reinterpret_cast<double4*>(decData)[(base_block_start_idx+i)/4] = dec_buffer;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             for(int i=0; i<32; i++)
+    //             {
+    //                 sign_ofs = i % 32;
+    //                 lorenQuant = sign_flag & (1 << (31 - sign_ofs)) ? absQuant[i] * -1 : absQuant[i];
+    //                 currQuant = lorenQuant + prevQuant;
+    //                 prevQuant = currQuant;
+    //                 if(base_block_start_idx+i < nbEle) decData[base_block_start_idx+i] = currQuant * eb * 2;
+    //             }
+    //         }
+    //     }
 
-        cur_byte_ofs += __shfl_sync(0xffffffff, tmp_byte_ofs, 31);
-    }
+    //     cur_byte_ofs += __shfl_sync(0xffffffff, tmp_byte_ofs, 31);
+    // }
 }
