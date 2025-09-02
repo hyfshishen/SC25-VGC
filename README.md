@@ -354,6 +354,7 @@ To reproduce each result, we provide a Python script to reproduce the whole resu
 ## 4.1 Memory-efficient Compression (Figure 15)
 
 Executing following prepared Python script can compile the source code for VGC memory-efficient compression.
+Before reproducing this stage, please make sure the datasets are downloaded and prepared accordingly as Section 2.3.
 
 ```shell
 $ python3 3-optional-me-compilation.py
@@ -363,7 +364,57 @@ After compilation is finished, executing the following prepared Python script ca
 
 ```shell
 $ python3 3-optional-me-throughput.py
+Running VGC Memory-Efficient (ME) on QMCPack...
+QMCPack VGC_D_ME compression throughput: 220.56389433333334 GB/s
+QMCPack VGC_O_ME compression throughput: 197.71132133333333 GB/s
 
+Running VGC Memory-Efficient (ME) on CESM-ATM...
+CESM-ATM VGC_D_ME compression throughput: 254.11440266666668 GB/s
+CESM-ATM VGC_O_ME compression throughput: 252.69115966666666 GB/s
+
+Running VGC Memory-Efficient (ME) on Miranda...
+Miranda VGC_D_ME compression throughput: 209.91125 GB/s
+Miranda VGC_O_ME compression throughput: 208.83180933333333 GB/s
+
+Running VGC Memory-Efficient (ME) on SynTruss...
+SynTruss VGC_D_ME compression throughput: 270.01423066666666 GB/s
+SynTruss VGC_O_ME compression throughput: 269.9573603333333 GB/s
+
+Running VGC Memory-Efficient (ME) on HCCI...
+HCCI VGC_D_ME compression throughput: 198.11400200000001 GB/s
+HCCI VGC_O_ME compression throughput: 183.76873333333333 GB/s
+
+Running VGC Memory-Efficient (ME) on RTM...
+RTM VGC_D_ME compression throughput: 235.05757766666667 GB/s
+RTM VGC_O_ME compression throughput: 241.53191233333334 GB/s
+
+Running VGC Memory-Efficient (ME) on MagRec...
+MagRec VGC_D_ME compression throughput: 203.46207800000002 GB/s
+MagRec VGC_O_ME compression throughput: 215.3502116666667 GB/s
+
+Running VGC Memory-Efficient (ME) on HACC...
+HACC VGC_D_ME compression throughput: 243.03237733333333 GB/s
+HACC VGC_O_ME compression throughput: 267.6842653333333 GB/s
+
+Running VGC Memory-Efficient (ME) on SCALE...
+SCALE VGC_D_ME compression throughput: 205.36164599999998 GB/s
+SCALE VGC_O_ME compression throughput: 231.12997499999997 GB/s
+
+Running VGC Memory-Efficient (ME) on NYX...
+NYX VGC_D_ME compression throughput: 205.27340800000002 GB/s
+NYX VGC_O_ME compression throughput: 247.808749 GB/s
+
+Running VGC Memory-Efficient (ME) on JetIn...
+JetIn VGC_D_ME compression throughput: 366.4896816666667 GB/s
+JetIn VGC_O_ME compression throughput: 370.1066913333334 GB/s
+
+Running VGC Memory-Efficient (ME) on S3D...
+S3D VGC_D_ME compression throughput: 398.53964633333334 GB/s
+S3D VGC_O_ME compression throughput: 411.0734473333334 GB/s
+
+Running VGC Memory-Efficient (ME) on NWChem...
+NWChem VGC_D_ME compression throughput: 370.81796333333335 GB/s
+NWChem VGC_O_ME compression throughput: 368.1596906666667 GB/s
 ```
 
 The throughput results should match or close to what is reported in Figure 15 (VGC-D-ME and VGC-O-ME).
@@ -371,7 +422,21 @@ Note that VGC-D and VGC-O are baseline methods and have been reproduced by previ
 Note that throughput may vary due to several factors (Dynamic Frequency Scaling, Thermal Throttling, etc); reviewers can re-run this script to obtain consistent results.
 
 ## 4.2 Selective Decompression (Figure 16)
-To be updated if needed.
+
+Executing following prepared Python script can compile the source code for VGC memory-efficient compression.
+Before reproducing this stage, please make sure the datasets are downloaded and prepared accordingly as Section 2.3.
+
+```shell
+$ python3 3-optional-sd-compilation.py
+```
+
+After compilation is finished, executing the following prepared Python script can reproduce the results for VGC memory-efficient compression.
+
+```shell
+```
+
+The throughput results should match or close to what is reported in Figure 16.
+Note that throughput may vary due to several factors (Dynamic Frequency Scaling, Thermal Throttling, etc); reviewers can re-run this script to obtain consistent results.
 
 ## 4.3 Dimension Impacts on RTM Compression Ratios (Table 3)
 To be updated if needed.
