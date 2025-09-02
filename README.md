@@ -423,19 +423,71 @@ Note that throughput may vary due to several factors (Dynamic Frequency Scaling,
 
 ## 4.2 Selective Decompression (Figure 16)
 
-Executing following prepared Python script can compile the source code for VGC memory-efficient compression.
+Executing following prepared Python script can compile the source code for VGC selective decompression.
 Before reproducing this stage, please make sure the datasets are downloaded and prepared accordingly as Section 2.3.
 
 ```shell
 $ python3 3-optional-sd-compilation.py
 ```
 
-After compilation is finished, executing the following prepared Python script can reproduce the results for VGC memory-efficient compression.
+After compilation is finished, executing the following prepared Python script can reproduce the results for VGC selective decompression.
 
 ```shell
+$ python3 3-optional-sd-throughput.py 
+Running VGC Selective Decompression (SD) on QMCPack...
+QMCPack VGC_D decompression throughput: 637.9103879999999 GB/s
+QMCPack VGC_O decompression throughput: 492.94904033333336 GB/s
+
+Running VGC Selective Decompression (SD) on CESM-ATM...
+CESM-ATM VGC_D decompression throughput: 548.55391233333336 GB/s
+CESM-ATM VGC_O decompression throughput: 628.57785 GB/s
+
+Running VGC Selective Decompression (SD) on Miranda...
+Miranda VGC_D decompression throughput: 2415.888037333333 GB/s
+Miranda VGC_O decompression throughput: 1748.663353 GB/s
+
+Running VGC Selective Decompression (SD) on SynTruss...
+SynTruss VGC_D decompression throughput: 2524.257821 GB/s
+SynTruss VGC_O decompression throughput: 2025.703682333333 GB/s
+
+Running VGC Selective Decompression (SD) on HCCI...
+HCCI VGC_D decompression throughput: 635.0815776666667 GB/s
+HCCI VGC_O decompression throughput: 431.74658266666665 GB/s
+
+Running VGC Selective Decompression (SD) on RTM...
+RTM VGC_D decompression throughput: 710.9140743333334 GB/s
+RTM VGC_O decompression throughput: 873.8153219999999 GB/s
+
+Running VGC Selective Decompression (SD) on MagRec...
+MagRec VGC_D decompression throughput: 408.0807593333334 GB/s
+MagRec VGC_O decompression throughput: 514.6098656666667 GB/s
+
+Running VGC Selective Decompression (SD) on HACC...
+HACC VGC_D decompression throughput: 1810.4876556666666 GB/s
+HACC VGC_O decompression throughput: 2274.345774 GB/s
+
+Running VGC Selective Decompression (SD) on SCALE...
+SCALE VGC_D decompression throughput: 539.8275653333334 GB/s
+SCALE VGC_O decompression throughput: 567.9200503333333 GB/s
+
+Running VGC Selective Decompression (SD) on NYX...
+NYX VGC_D decompression throughput: 1080.6936706666668 GB/s
+NYX VGC_O decompression throughput: 975.814941 GB/s
+
+Running VGC Selective Decompression (SD) on JetIn...
+JetIn VGC_D decompression throughput: 2089.5569826666665 GB/s
+JetIn VGC_O decompression throughput: 2016.7483986666666 GB/s
+
+Running VGC Selective Decompression (SD) on S3D...
+S3D VGC_D decompression throughput: 2519.3507446666667 GB/s
+S3D VGC_O decompression throughput: 2326.1455049999995 GB/s
+
+Running VGC Selective Decompression (SD) on NWChem...
+NWChem VGC_D decompression throughput: 2594.123771666667 GB/s
+NWChem VGC_O decompression throughput: 2308.5940793333334 GB/s
 ```
 
-The throughput results should match or close to what is reported in Figure 16.
+The throughput results should match or close to what is reported in Figure 16 (VGC-D and VGC-O).
 Note that throughput may vary due to several factors (Dynamic Frequency Scaling, Thermal Throttling, etc); reviewers can re-run this script to obtain consistent results.
 
 ## 4.3 Dimension Impacts on RTM Compression Ratios (Table 3)
