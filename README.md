@@ -352,7 +352,23 @@ However, we will provide step-by-step instructions here.
 To reproduce each result, we provide a Python script to reproduce the whole results within only one command line effort.
 
 ## 4.1 Memory-efficient Compression (Figure 15)
-To be updated if needed.
+
+Executing following prepared Python script can compile the source code for VGC memory-efficient compression.
+
+```shell
+$ python3 3-optional-me-compilation.py
+```
+
+After compilation is finished, executing the following prepared Python script can reproduce the results for VGC memory-efficient compression.
+
+```shell
+$ python3 3-optional-me-throughput.py
+
+```
+
+The throughput results should match or close to what is reported in Figure 15 (VGC-D-ME and VGC-O-ME).
+Note that VGC-D and VGC-O are baseline methods and have been reproduced by previous steps. 
+Note that throughput may vary due to several factors (Dynamic Frequency Scaling, Thermal Throttling, etc); reviewers can re-run this script to obtain consistent results.
 
 ## 4.2 Selective Decompression (Figure 16)
 To be updated if needed.

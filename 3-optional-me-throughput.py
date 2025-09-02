@@ -1,14 +1,6 @@
 import os, sys
 import subprocess
 
-# compilation
-os.chdir("./vgc/vgc-versatility/memory-efficient")
-os.system("mkdir build")
-os.chdir("./build")
-os.system("cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../install/ ..")
-os.system("make -j && make install")
-os.chdir("../../../")
-
 # execution
 vgc_path_f32_d = "./vgc/vgc-versatility/memory-efficient/install/bin/memory-efficient-plain_f32 -m plain -t f32"
 vgc_path_f32_o = "./vgc/vgc-versatility/memory-efficient/install/bin/memory-efficient-plain_f32 -m outlier -t f32"
